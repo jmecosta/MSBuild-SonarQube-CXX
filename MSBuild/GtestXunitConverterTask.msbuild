@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="CheckCore" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <UsingTask TaskName="GtestXunitConverterTask" AssemblyFile="GtestXunitConverterTask.dll"/>
+    <Target Name="GtestXunitConverterCheckCustom">
+        <GtestXunitConverterTask SolutionPathToAnalyse="$(UserSolutionPathToAnalyse)"
+                  TestSuffix="$(UserTestSuffix)"
+                  GtestXMLReportFile="$(UserXmlReportPath)"
+                  GtestXunitConverterOutputPath="$(UserXmlOutputPath)"
+                  PathReplacementStrings="$(UserPathReplacementStrings)"
+                  SkipSearchForFileLocation="$(UserSkipSearchForFileLocation)"
+                      />
+    </Target>
+</Project>

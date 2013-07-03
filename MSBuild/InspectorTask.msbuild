@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="MemoryCheckAll" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <UsingTask TaskName="IntelInspectorTask" AssemblyFile="InspectorTask.dll" />
+    <Target Name="MemoryCheckCustom">
+        <IntelInspectorTask StackDepth="$(StackDepth)"
+                            AnalysisType="$(UserAnalysisType)"
+                            ExecutableToRun="$(CustomExecutable)"
+                            ExecutableEnvironment="INSPECTOR_2013_DIR=C:\Program Files (x86)\Intel\Inspector XE 2013"
+                            PathToIntelInspector="C:\Program Files (x86)\Intel\Inspector XE 2013"
+                            ResourceLeaks="true"
+                            ResultFile="$(CsvOutFile)"
+                        />
+    </Target>
+</Project>

@@ -1,0 +1,29 @@
+################################################################################
+###                          WHAT IS THIS                                    ###
+################################################################################
+
+This is a sample project demonstrating to run static analysis and format the code for sonar.
+
+
+It assumes following software to be installed:
+- vera
+- cppcheck
+- rats
+- sonar runner in the path
+
+See the the Cxx-Plugin Wiki for some details on dependencies:
+http://docs.codehaus.org/display/SONAR/CXX+Plugin
+
+
+################################################################################
+###                              USAGE                                       ###
+################################################################################
+
+1) Non parallel analysis
+	msbuild SonarTask.msbuild /t:CheckSample
+2) Parallel analysis
+	msbuild SonarTask.msbuild /t:CheckSampleInParallel
+
+# runs analysis + sonar
+3) msbuild SonarTask.msbuild /t:RunSonar
+

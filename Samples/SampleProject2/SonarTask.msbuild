@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="CheckCore" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+ <Import Project="..\..\MSBuild\MSBuild.ExtensionPack.tasks"/>
+  <PropertyGroup>
+    <UserPathReplacementStrings></UserPathReplacementStrings>
+	<UserSolutionPathToAnalyse>SampleProject2.sln</UserSolutionPathToAnalyse>
+	
+	<!-- CppCheck Specific Properties-->
+	<UserCppCheckPath>e:\TSSRC\MSBuild\Sonar\Apps\cppcheck\cppcheck.exe</UserCppCheckPath>
+	<CppCheckOptions>--inline-suppr;--enable=all;-j </CppCheckOptions>
+	<UserCppCheckDefines>__cplusplus;UNITTEST_VERSION;DEVELOPER_VERSION;NT</UserCppCheckDefines>
+	<UserCppCheckIgnores></UserCppCheckIgnores>
+	<UserCppCheckOutputType>xml-version-1</UserCppCheckOutputType>
+	<UserOutputPath>build\reports-cppcheck</UserOutputPath>
+	
+	<!-- Rats Specific Properties -->	
+	<UserRatsPath>e:\TSSRC\MSBuild\Sonar\Apps\rats-2.3\rats.exe</UserRatsPath>
+	<UserRatsOutputType>xml</UserRatsOutputType>
+	<UserRatsOutputPath>build\reports-rats</UserRatsOutputPath>
+	
+	<!-- Vera Specific Properties -->
+	<UserVeraPath>e:\TSSRC\MSBuild\Sonar\Apps\vera++\vera++.exe</UserVeraPath>
+	<UserVeraOutputType>xml</UserVeraOutputType>
+	<UserVeraOptions>-nodup -showrules</UserVeraOptions>
+	<UserVeraOutputPath>build\reports-vera++</UserVeraOutputPath>
+  </PropertyGroup>
+  
+  <Import Project="..\..\MSBuild\VeraTask.msbuild" />
+  <Import Project="..\..\MSBuild\RatsTask.msbuild" />
+  <Import Project="..\..\MSBuild\CppCheckTask.msbuild" />
+
+  <Target Name="CheckSampleInParallel">
+    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="RatsCheckCustom;VeraCheckCustom;CppCheckCheckCustom"/>
+  </Target>
+  
+  <Target Name="CheckSample" DependsOnTargets="RatsCheckCustom;VeraCheckCustom;CppCheckCheckCustom">
+  </Target>
+  
+  <Target Name="RunSonar" DependsOnTargets="CheckSampleInParallel">
+	<Exec Command="sonar-runner"/>
+  </Target>
+  
+</Project>
