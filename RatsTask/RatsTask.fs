@@ -118,7 +118,7 @@ type RatsTask() as this =
         if not(String.IsNullOrWhiteSpace(x.RatsOptions)) then
             let values = x.RatsOptions.Split(";".ToCharArray())
             for value in values do
-                builder.AppendSwitch(value)
+                builder.AppendSwitch(value.Trim())
 
         builder.AppendSwitch(fileToAnalyse)
 

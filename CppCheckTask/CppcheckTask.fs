@@ -88,7 +88,7 @@ type CppCheckTask() as this =
         if not(String.IsNullOrWhiteSpace(x.CppCheckIgnores)) then
             let values = x.CppCheckIgnores.Split(";".ToCharArray())
             for value in values do
-                builder.AppendSwitch(value)
+                builder.AppendSwitch(value.Trim())
 
         builder.AppendSwitch(Directory.GetParent(x.SolutionPathToAnalyse).ToString())
 

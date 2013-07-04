@@ -218,7 +218,7 @@ type CppLintTask() as this =
                     skip <- true
 
                 for ignore in ignoreFiles do
-                    let pathignore = Path.Combine(Directory.GetParent(x.SolutionPathToAnalyse).ToString(), ignore)
+                    let pathignore = Path.Combine(Directory.GetParent(x.SolutionPathToAnalyse).ToString(), ignore.Trim())
                     if Path.GetFullPath(file) = Path.GetFullPath(pathignore) then skip <- true
 
                 if not(skip) then
