@@ -85,8 +85,9 @@ type VeraTask() as this =
     member x.ExecuteVera executor filepath ouputFilePath =
         // set environment
         let mutable env = Map.ofList []
-        if Environment.GetEnvironmentVariable("VERA_ROOT") = null then           
-            env <- Map.ofList [("VERA_ROOT", Directory.GetParent(x.VeraPath).ToString())]
+        if Environment.GetEnvironmentVariable("VERA_ROOT") = null then
+            let pathVera = Path.Combine(Directory.GetParent(Directory.GetParent(x.VeraPath).ToString()).ToString(), "lib\\vera++")
+            env <- Map.ofList [("VERA_ROOT", pathVera)]
 
         let mutable tries = 3
         let mutable returncode = 1
@@ -96,6 +97,16 @@ type VeraTask() as this =
             returncode <- (executor :> ICommandExecutor).ExecuteCommand(x.VeraPath, x.generateCommandLineArgs(filepath), env)
             if not((executor :> ICommandExecutor).GetErrorCode = ReturnCode.Ok) || returncode > 0 then
                 tries <- tries - 1
+                if this.BuildEngine = null then
+                    Console.WriteLine("Vera: Try Failed")
+                    (executor :> ICommandExecutor).GetStdError |> fun s -> for i in s do Console.WriteLine(i)
+                else
+                    logger.LogWarning("Vera: Try Failed: Error")
+                    (executor :> ICommandExecutor).GetStdError |> fun s -> for i in s do logger.LogWarning(i)
+
+                /// and a newline to the end of the file # https://bitbucket.org/verateam/vera/issue/34/last-line-comment-produces-an-error
+                use wr = new StreamWriter(filepath, true)
+                wr.WriteLine("")
 
         if tries = 0 then
             if this.BuildEngine = null then
@@ -184,7 +195,7 @@ type VeraTask() as this =
                     skip <- true
 
                 for ignore in ignoreFiles do
-                    let pathignore = Path.Combine(Directory.GetParent(x.SolutionPathToAnalyse).ToString(), ignore)
+                    let pathignore = Path.Combine(Directory.GetParent(x.SolutionPathToAnalyse).ToString(), ignore.Trim())
                     if Path.GetFullPath(file) = Path.GetFullPath(pathignore) then skip <- true
 
                 if not(skip) then
