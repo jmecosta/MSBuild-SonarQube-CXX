@@ -272,10 +272,13 @@ type IntelInspectorTask() as this =
             _log.LogMessage(sprintf "Intel Timeout %d" this.stopWatch.ElapsedMilliseconds)
 
             for name in System.Diagnostics.Process.GetProcessesByName(_inspectorExecutable) do
+                _log.LogMessage(sprintf "Kill Process %s %i" name.ProcessName name.Id)
                 Process.GetProcessById(name.Id).Kill()
             for name in System.Diagnostics.Process.GetProcessesByName(_inspectorExecutableMC) do
+                _log.LogMessage(sprintf "Kill Process %s %i" name.ProcessName name.Id)
                 Process.GetProcessById(name.Id).Kill()
-            for name in System.Diagnostics.Process.GetProcessesByName(Path.GetFileName(this.ExecutableToRun)) do
+            for name in System.Diagnostics.Process.GetProcessesByName(Path.GetFileName(this.ExecutableToRun).ToString()) do
+                _log.LogMessage(sprintf "Kill Process %s %s %i" (Path.GetFileName(this.ExecutableToRun).ToString()) name.ProcessName name.Id)
                 Process.GetProcessById(name.Id).Kill()
 
             Environment.Exit(0)
