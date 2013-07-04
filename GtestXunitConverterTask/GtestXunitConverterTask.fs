@@ -97,7 +97,7 @@ type GtestXunitConverterTask() as this =
     let logger : TaskLoggingHelper = new TaskLoggingHelper(this)
 
     member val buildok : bool = true with get, set
-    member val counter : int = 0 with get, set
+    member val counterFile : int = 0 with get, set
     member val ToOutputData : string list = [] with get, set
     member val testFiles : string list = [] with get, set
 
@@ -126,7 +126,6 @@ type GtestXunitConverterTask() as this =
         let xunitReport = GtestXmlReport.Parse(File.ReadAllText(filePath))
 
         let mutable xmloutputcontent = ""
-        let mutable counterFile = 0
 
         let addLine (line:string, ouputFilePath) =                  
             use wr = new StreamWriter(ouputFilePath, true)
@@ -153,8 +152,8 @@ type GtestXunitConverterTask() as this =
                     skipCase <- false                
 
             if not(skipCase) then
-                let xml_file = Path.Combine(x.GtestXunitConverterOutputPath, String.Concat(String.Concat("xunit-result-", counterFile),".xml"))
-                counterFile <- counterFile + 1
+                let xml_file = Path.Combine(x.GtestXunitConverterOutputPath, String.Concat(String.Concat("xunit-result-", this.counterFile),".xml"))
+                this.counterFile <- this.counterFile + 1
                 addLine("""<?xml version="1.0" encoding="UTF-8"?>""", xml_file)
                 let mutable fileName = ""
                 if not(x.SkipSearchForFileLocation) then
@@ -167,10 +166,6 @@ type GtestXunitConverterTask() as this =
                     addLine(casestr, xml_file)
                 addLine("""</testsuite>""", xml_file)                 
         ()
-
-    member x.ExecuteGtestXunitConverter filepath ouputFilePath =
-        ()
-
 
     override x.Execute() =
 
@@ -191,7 +186,8 @@ type GtestXunitConverterTask() as this =
 
             solutionHelper.GetProjectFilesFromSolutions(x.SolutionPathToAnalyse) |> Seq.iter (fun x -> iterateOverProjectFiles x)
 
-            this.ParseXunitReport this.GtestXMLReportFile
+            for repfile in Directory.GetFiles(Directory.GetParent(this.GtestXMLReportFile).ToString(), Path.GetFileName(this.GtestXMLReportFile)) do
+                this.ParseXunitReport repfile
 
             if this.BuildEngine = null then
                 System.Console.WriteLine(sprintf "GtestXunitConverter End: %u ms" stopWatchTotal.ElapsedMilliseconds)

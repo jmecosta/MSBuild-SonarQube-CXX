@@ -24,7 +24,7 @@
     </DocumentationFile>
     <StartAction>Program</StartAction>
     <StartProgram>C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe</StartProgram>
-    <StartArguments>../MSBuild/SonarTask.msbuild /t:CheckGtestXunitConverterModelXML</StartArguments>
+    <StartArguments>../MSBuild/SonarTask.msbuild /t:CheckGtestXunitConverterModelTesterXML</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
