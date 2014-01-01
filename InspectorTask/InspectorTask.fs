@@ -86,8 +86,6 @@ type IntelInspectorTask() as this =
 
     [<Required>]
     member val PathToIntelInspector = "C:\Program Files (x86)\Intel\Inspector XE 2013" with get, set
-
-    member val AppWorkDir = "" with get, set
         
     /// Specifies the executable command line parameters
     member val ExecutableParameters : string = null with get, set
@@ -230,7 +228,7 @@ type IntelInspectorTask() as this =
         for line in fileLines do
             let elems = line.Split(',')
             if elems.Length > 5 then
-                let source = elems.[0].Replace("\"","")
+                let mutable source = elems.[0].Replace("\"","")
                 let mutable line = elems.[1].Replace("\"","")
                 try
                     if Convert.ToInt32(line) > 1000000 then line <- "0"
@@ -250,6 +248,12 @@ type IntelInspectorTask() as this =
                     if typeid.ToLower() = ErrorCategories.[i] then
                         index <- i
                         foundrule <- true
+
+                if source.StartsWith("d:") then
+                    source <- source.Replace("d:", "")
+
+                if source.StartsWith("D:") then
+                    source <- source.Replace("D:", "")
 
                 if foundrule then
                     let errormsg = sprintf """<error file="%s" line="%s" id="intelXe.%s" severity="%s" msg="%s"/>""" source line ErrorCategoriesKeys.[index] severity msg
@@ -277,7 +281,7 @@ type IntelInspectorTask() as this =
             for name in System.Diagnostics.Process.GetProcessesByName(_inspectorExecutableMC) do
                 _log.LogMessage(sprintf "Kill Process %s %i" name.ProcessName name.Id)
                 Process.GetProcessById(name.Id).Kill()
-            for name in System.Diagnostics.Process.GetProcessesByName(Path.GetFileName(this.ExecutableToRun).ToString()) do
+            for name in System.Diagnostics.Process.GetProcessesByName(Path.GetFileName(this.ExecutableToRun).ToString().Replace(".exe", "").Replace(".EXE", "")) do
                 _log.LogMessage(sprintf "Kill Process %s %s %i" (Path.GetFileName(this.ExecutableToRun).ToString()) name.ProcessName name.Id)
                 Process.GetProcessById(name.Id).Kill()
 

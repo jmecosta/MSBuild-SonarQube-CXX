@@ -13,37 +13,60 @@
   <Import Project="CppCheckTask.msbuild" />
   <Import Project="GtestXunitConverterTask.msbuild" />
 
+  <Target Name="CheckToolKits">
+    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraCheckToolKitsXML;CheckCppLintCheckToolKitsXML;CppCheckCheckToolKitsXML;CheckRatsCheckToolKitsXML"/>
+  </Target>
+  
+  <Target Name="CheckReferenceModelPlugin">
+    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraCheckCheckReferenceModelPluginXML;CheckCppLintCheckCheckReferenceModelPluginXML;CppCheckCheckCheckReferenceModelPluginXML;CheckRatsCheckCheckReferenceModelPluginXML"/>
+  </Target>  
+
+  <Target Name="CheckRPCApps">
+    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="VeraCheckRPCAppsXML;CppLintCheckRPCAppsXML;CppCheckCheckRPCAppsXML;RatsCheckRPCAppsXML"/>
+  </Target> 
+
   <Target Name="CheckCommon">
-    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraCommonXML;CheckCppLintCommonXML;CppCheckCommonXML;CheckRatsCommonXML;CheckGtestXunitConverterCommonXML"/>
+    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraCommonXML;CheckCppLintCommonXML;CppCheckCommonXML;CheckRatsCommonXML"/>
   </Target>
   <Target Name="CheckAnalysis">
-    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraAnalysisXML;CheckCppLintAnalysisXML;CppCheckAnalysisXML;CheckRatsAnalysisXML;CheckGtestXunitConverterAnalysisXML"/>
+    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraAnalysisXML;CheckCppLintAnalysisXML;CppCheckAnalysisXML;CheckRatsAnalysisXML"/>
   </Target>
   <Target Name="CheckBrepStorage">
-    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraBrepStorageXML;CheckCppLintBrepStorageXML;CppCheckBrepStorageXML;CheckRatsBrepStorageXML;CheckGtestXunitConverterBrepStorateXML"/>
+    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraBrepStorageXML;CheckCppLintBrepStorageXML;CppCheckBrepStorageXML;CheckRatsBrepStorageXML"/>
   </Target>
   <Target Name="CheckCatalogs">
-    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraCatalogsXML;CheckCppLintCatalogsXML;CppCheckCatalogsXML;CheckRatsCatalogsXML;CheckGtestXunitConverterCatalogsXML"/>
+    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraCatalogsXML;CheckCppLintCatalogsXML;CppCheckCatalogsXML;CheckRatsCatalogsXML"/>
   </Target>
+  <Target Name="CheckReinforcement">
+    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraReinforcementXML;CheckCppLintReinforcementXML;CppCheckReinforcementXML;CheckRatsReinforcementXML"/>
+  </Target>  
   <Target Name="CheckDimensioning">
-    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraDimensioningXML;CheckCppLintDimensioningXML;CppCheckDimensioningXML;CheckRatsDimensioningXML;CheckGtestXunitConverterDimensioningXML"/>
+    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraDimensioningXML;CheckCppLintDimensioningXML;CppCheckDimensioningXML;CheckRatsDimensioningXML"/>
   </Target>
   <Target Name="CheckDrawings">
-    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraDrawingsXML;CheckCppLintDrawingsXML;CppCheckDrawingsXML;CheckRatsDrawingsXML;CheckGtestXunitConverterDrawingsXML"/>
+    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraDrawingsXML;CheckCppLintDrawingsXML;CppCheckDrawingsXML;CheckRatsDrawingsXML"/>
   </Target>
   <Target Name="CheckEnvironment">
-    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraEnvironmentXML;CheckCppLintEnvironmentXML;CppCheckEnvironmentXML;CheckRatsEnvironmentXML;CheckGtestXunitConverterEnvironmentXML"/>
+    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraEnvironmentXML;CheckCppLintEnvironmentXML;CppCheckEnvironmentXML;CheckRatsEnvironmentXML"/>
   </Target>
   <Target Name="CheckImporterComponent">
-    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraImporterComponentXML;CheckCppLintImporterComponentXML;CppCheckImporterComponentXML;CheckRatsImporterComponentXML;CheckGtestXunitConverterImporterComponentXML"/>
+    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraImporterComponentXML;CheckCppLintImporterComponentXML;CppCheckImporterComponentXML;CheckRatsImporterComponentXML"/>
   </Target>
   <Target Name="CheckModel">
-    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraModelXML;CheckCppLintModelXML;CppCheckModelXML;CheckRatsModelXML;CheckGtestXunitConverterModelXML"/>
+    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraModelXML;CheckCppLintModelXML;CppCheckModelXML;CheckRatsModelXML"/>
   </Target>
   <Target Name="CheckSolids">
-    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraSolidsXML;CheckCppLintSolidsXML;CppCheckSolidsXML;CheckRatsSolidsXML;CheckGtestXunitConverterSolidsXML"/>
+    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraSolidsXML;CheckCppLintSolidsXML;CppCheckSolidsXML;CheckRatsSolidsXML"/>
   </Target>
   <Target Name="CheckTeklaStructures">
-    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraTeklaStructuresXML;CheckCppLintTeklaStructuresXML;CppCheckTeklaStructuresXML;CheckRatsTeklaStructuresXML;CheckGtestXunitConverterTeklaStructuresXML"/>
+    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraTeklaStructuresXML;CheckCppLintTeklaStructuresXML;CppCheckTeklaStructuresXML;CheckRatsTeklaStructuresXML"/>
   </Target>
+  <Target Name="CheckModelTester">
+    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckVeraModelTesterXML;CheckCppLintModelTesterXML;CppCheckModelTesterXML;CheckRatsModelTesterXML"/>
+  </Target> 
+  <Target Name="GtestConverterAllReports">
+    <ExtensionPack.Framework.Parallel TaskAction="BuildTargetsInParallel" Targets="CheckGtestXunitConverterTeklaStructuresXML;CheckGtestXunitConverterSolidsXML;CheckGtestXunitConverterModelXML;CheckGtestXunitConverterEnvironmentXML;CheckGtestXunitConverterDrawingsXML;CheckGtestXunitConverterDimensioningXML;CheckGtestXunitConverterCatalogsXML;CheckGtestXunitConverterAnalysisXML;CheckGtestXunitConverterCommonXML"/>
+  </Target>
+
+  <Target Name="GtestRunAndConverterAllReports" DependsOnTargets="RunGtestAndXunitConverterTeklaStructuresXML;RunGtestAndXunitConverterSolidsXML;RunGtestAndXunitConverterModelXML;RunGtestAndXunitConverterEnvironmentXML;RunGtestAndXunitConverterDrawingsXML;RunGtestAndXunitConverterDimensioningXML;RunGtestAndXunitConverterCatalogsXML;RunGtestAndXunitConverterAnalysisXML;RunGtestAndXunitConverterCommonXML"/>
 </Project>

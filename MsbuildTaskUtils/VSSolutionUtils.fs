@@ -30,7 +30,7 @@ type VSSolutionUtils() =
 type VSProjectUtils() = 
     let Readlines solutionPath = File.ReadLines(solutionPath)
 
-    member this.GetCppCompilationFiles(projectFile : string, hasString : string, pathReplaceStrings : string) =
+    member this.GetCompilationFiles(projectFile : string, hasString : string, pathReplaceStrings : string) =
         let mutable files : string list = []
         let str = String.Concat(Readlines(projectFile))
         let data = CppProjectFile.Parse(str)
@@ -63,6 +63,14 @@ type VSProjectUtils() =
 
             for headers in item.GetClIncludes() do
                 let validFile = filterAndChangeStringsInFile headers.Include
+                if not(String.IsNullOrEmpty(validFile)) then
+                    if Path.IsPathRooted(validFile) then
+                        files <- files @ [validFile]                        
+                    else
+                        files <- files @ [Path.Combine(Directory.GetParent(projectFile).ToString(), validFile)]
+
+            for cssource in item.GetCompiles() do
+                let validFile = filterAndChangeStringsInFile cssource.Include
                 if not(String.IsNullOrEmpty(validFile)) then
                     if Path.IsPathRooted(validFile) then
                         files <- files @ [validFile]                        

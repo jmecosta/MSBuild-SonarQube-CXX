@@ -1,0 +1,32 @@
+﻿<Project DefaultTargets="AfterBuild" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\root_configuration.props" Condition="$(UserSRCDir) == ''"/>
+  <UsingTask TaskName="NunitRunnerTask" AssemblyFile="NunitRunnerTask.dll" />
+  <PropertyGroup>
+    <AssemblyExtension>.dll</AssemblyExtension>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(OutputType)' == 'WinExe'">
+    <AssemblyExtension>.exe</AssemblyExtension>
+  </PropertyGroup>
+  
+  <Target Name="AfterBuild" Condition="'$(NunitRunnerTaskEnabled)' != 'FALSE' AND '$(TEAMCITY_VERSION)' == ''">
+  <Message Text="Run Nunit Test Assembly $(OutputPath)$(AssemblyName)$(AssemblyExtension)" Importance="High" />
+  <Message Text="Solution Paht $(SolutionDir)" Importance="High" />
+  <NunitRunnerTask GallioPath="$(UserSRCDir)\MSBuild\BuildTools\Gallio\bin\Gallio.Echo.exe"
+                  NunitPath="$(UserSRCDir)\MSBuild\BuildTools\Nunit"
+                  OpenCoverPath="$(UserSRCDir)\MSBuild\BuildTools\OpenCover\OpenCover.Console.exe"
+                  TestRunner="Nunit"
+                  Processor="x86"
+                  GallioTestFilter="exclude Category:ReferenceModelTests,ComponentTests,ViewTest"
+                  NunitTestFilter=""                       
+                  OutputReportPaths="$(SolutionDir)"
+                  CoverageReportFormat="coverage-report.xml"
+                  UnitTestReportFormat="unittest-report.xml"
+                  GallioRunnerType="IsolatedProcess"
+                  AssembliesToTest="$(OutputPath)$(AssemblyName)$(AssemblyExtension)"
+                  TeklaStructuresExecPath="$(UserBINDir)\$(ActualBinDir)"
+                  ProduceCoverage="false"
+                  AttachDebugger="false"
+                  BreakBuildOnFailedTests="false"/>
+    </Target>
+</Project>

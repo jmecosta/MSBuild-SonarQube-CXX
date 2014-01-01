@@ -11,6 +11,9 @@
     <AssemblyName>GtestXunitConverterTask</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Name>GtestXunitConverterTask</Name>
+    <TargetFSharpCoreVersion>4.3.1.0</TargetFSharpCoreVersion>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -24,7 +27,8 @@
     </DocumentationFile>
     <StartAction>Program</StartAction>
     <StartProgram>C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe</StartProgram>
-    <StartArguments>../MSBuild/SonarTask.msbuild /t:CheckGtestXunitConverterModelTesterXML</StartArguments>
+    <StartArguments>..\MSBuild\GtestXunitConverterTask.msbuild /p:GtestExeFile=e:\prod\structures\bin\work\bin_x64/CommonTests.exe /p:RunTests=true /p:SolutionPathToAnalyse=e:\prod\structures\src\work\Core\Common\Common.sln /p:GtestXunitConverterOutputPath=e:\prod\structures\src\work\reports\Common</StartArguments>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -37,38 +41,55 @@
     </DocumentationFile>
     <StartAction>Program</StartAction>
     <StartProgram>C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe</StartProgram>
-    <StartArguments>..\MSBuild\GtestXunitConverterTask.msbuild /t:CheckGtestXunitConverterCommonXML</StartArguments>
+    <StartArguments>..\MSBuild\GtestXunitConverterTask.msbuild /t:GtestRunAndConverterAllReports /p:TSPlatform=x64 /p:Configuration=Debug</StartArguments>
   </PropertyGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
   </PropertyGroup>
-  <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets" Condition=" Exists('$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets')" />
+  <Choose>
+    <When Condition="'$(VisualStudioVersion)' == '11.0'">
+      <PropertyGroup>
+        <FSharpTargetsPath>$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets</FSharpTargetsPath>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <FSharpTargetsPath>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets</FSharpTargetsPath>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+  <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
   <ItemGroup>
     <Compile Include="GtestXunitConverterTask.fs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="FSharp.Core">
+      <HintPath>..\MSBuild\FSharp.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="FSharp.Data">
-      <HintPath>..\packages\FSharp.Data.1.1.5\lib\net40\FSharp.Data.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\MSBuild\FSharp.Data.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="FSharp.Data.DesignTime">
-      <HintPath>..\packages\FSharp.Data.1.1.5\lib\net40\FSharp.Data.DesignTime.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\MSBuild\FSharp.Data.DesignTime.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.Build" />
     <Reference Include="Microsoft.Build.Engine" />
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="mscorlib" />
-    <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
+    <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\CommandExecutor\CommandExecutor.fsproj">
+      <Name>CommandExecutor</Name>
+      <Project>{9b154406-0af6-45a9-bf32-9c5c23822b6b}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\MsbuildTaskUtils\MsbuildTaskUtils.fsproj">
       <Name>MsbuildTaskUtils</Name>
       <Project>{8e7d4ac9-ab34-4f3a-bfc6-7bc7b9aac9ae}</Project>

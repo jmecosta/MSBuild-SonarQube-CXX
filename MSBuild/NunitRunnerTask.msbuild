@@ -1,0 +1,416 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="CheckCustom" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\root_configuration.props" Condition="$(UserBINDir) == ''"/>
+  <PropertyGroup Condition="'$(ActualBinDir)' == ''">
+    <ActualBinDir>bin</ActualBinDir>
+  </PropertyGroup>
+    
+  <UsingTask TaskName="NunitRunnerTask" AssemblyFile="NunitRunnerTask.dll" />
+    
+  <Target Name="RunNunitTaskInAssembly">
+    <NunitRunnerTask GallioPath="$(GallioPath)"
+                NunitPath="$(NunitPath)"
+                OpenCoverPath="$(OpenCoverPath)"
+                TestRunner="$(TestRunner)"
+                Processor="$(Processor)"
+                GallioRunnerType="$(GallioRunnerType)"
+                OutputReportPaths="$(OutputReportPaths)"
+                CoverageReportFormat="$(CoverageReportFormat)"
+                UnitTestReportFormat="$(UnitTestReportFormat)"
+                AssembliesToTest="$(AssembliesToTest)"
+                TeklaStructuresExecPath="$(XSBIN)"
+                ProduceCoverage="$(ProduceCoverage)"
+                GallioTestFilter="$(GallioTestFilter)"
+                NunitTestFilter="$(NunitTestFilter)"
+                />
+    </Target>
+ 
+    <Target Name="RunLaunchTests">
+      <Message Text="UserSRCDir = $(UserSRCDir)"/> 
+      <Message Text="XSBIN = $(XSBIN)"/> 
+      <Message Text="XS_DIR = $(XS_DIR)"/> 
+      <NunitRunnerTask GallioPath="$(UserSRCDir)\MSBuild\BuildTools\Gallio\bin\Gallio.Echo.exe"
+                  NunitPath="$(UserSRCDir)\MSBuild\BuildTools\Nunit"
+                  OpenCoverPath="$(UserSRCDir)\MSBuild\BuildTools\OpenCover\OpenCover.Console.exe"
+                  TestRunner="Gallio"
+                  Processor="x86"
+                  GallioTestFilter=""
+                  NunitTestFilter=""                       
+                  OutputReportPaths="$(UserSRCDir)\MSBuild"
+                  CoverageReportFormat="launch-coverage-report"
+                  UnitTestReportFormat="launch-unittest-report"
+                  GallioRunnerType="IsolatedProcess"
+                  AssembliesToTest="$(BinDir)\test\Tekla.Structures.Launch.Test.dll"
+                  TeklaStructuresExecPath="$(BinDir)"
+                  ProduceCoverage="false"
+                  AttachDebugger="$(DEBUGON)"
+                  BreakBuildOnFailedTests="false"
+                  />
+      
+    </Target>
+    
+    <Target Name="RunDrawingsTests">
+      <Message Text="UserSRCDir = $(UserSRCDir)"/> 
+      <Message Text="XSBIN = $(XSBIN)"/> 
+      <Message Text="XS_DIR = $(XS_DIR)"/> 
+      <NunitRunnerTask GallioPath="$(UserSRCDir)\MSBuild\BuildTools\Gallio\bin\Gallio.Echo.exe"
+                  NunitPath="$(UserSRCDir)\MSBuild\BuildTools\Nunit"
+                  OpenCoverPath="$(UserSRCDir)\MSBuild\BuildTools\OpenCover\OpenCover.Console.exe"
+                  TestRunner="Gallio"
+                  Processor="x86"
+                  GallioTestFilter="exclude Category: Slower"
+                  NunitTestFilter="/exclude:Slower"                       
+                  OutputReportPaths="$(UserSRCDir)\MSBuild"
+                  CoverageReportFormat="drawings-coverage-report"
+                  UnitTestReportFormat="drawings-unittest-report"
+                  GallioRunnerType="IsolatedProcess"
+                  AssembliesToTest="$(BinDir)\test\Tekla.Structures.Drawing.Test.dll"
+                  TeklaStructuresExecPath="$(BinDir)"
+                  ProduceCoverage="false"
+                  AttachDebugger="$(DEBUGON)"
+                  BreakBuildOnFailedTests="false"
+                  />
+    </Target>
+    
+    <Target Name="RunDrawingsTestsSlower">
+      <Message Text="UserSRCDir = $(UserSRCDir)"/> 
+      <Message Text="XSBIN = $(XSBIN)"/> 
+      <Message Text="XS_DIR = $(XS_DIR)"/> 
+      <NunitRunnerTask GallioPath="$(UserSRCDir)\MSBuild\BuildTools\Gallio\bin\Gallio.Echo.exe"
+                  NunitPath="$(UserSRCDir)\MSBuild\BuildTools\Nunit"
+                  OpenCoverPath="$(UserSRCDir)\MSBuild\BuildTools\OpenCover\OpenCover.Console.exe"
+                  TestRunner="Gallio"
+                  Processor="x86"
+                  GallioTestFilter="Category: Slower"
+                  NunitTestFilter="Category: Slower"                       
+                  OutputReportPaths="$(UserSRCDir)\MSBuild"
+                  CoverageReportFormat="drawings-slower-coverage-report"
+                  UnitTestReportFormat="drawings-slower-unittest-report"
+                  GallioRunnerType="IsolatedProcess"
+                  AssembliesToTest="$(BinDir)\test\Tekla.Structures.Drawing.Test.dll"
+                  TeklaStructuresExecPath="$(BinDir)"
+                  ProduceCoverage="false"
+                  AttachDebugger="$(DEBUGON)"
+                  BreakBuildOnFailedTests="false"
+                  />
+    </Target>
+    
+    <Target Name="RunCatalogsTests">
+      <Message Text="UserSRCDir = $(UserSRCDir)"/> 
+      <Message Text="XSBIN = $(XSBIN)"/> 
+      <Message Text="XS_DIR = $(XS_DIR)"/> 
+      <NunitRunnerTask GallioPath="$(UserSRCDir)\MSBuild\BuildTools\Gallio\bin\Gallio.Echo.exe"
+                  NunitPath="$(UserSRCDir)\MSBuild\BuildTools\Nunit"
+                  OpenCoverPath="$(UserSRCDir)\MSBuild\BuildTools\OpenCover\OpenCover.Console.exe"
+                  TestRunner="Gallio"
+                  Processor="x86"
+                  GallioTestFilter=""
+                  NunitTestFilter=""                       
+                  OutputReportPaths="$(UserSRCDir)\MSBuild"
+                  CoverageReportFormat="catalogs-coverage-report"
+                  UnitTestReportFormat="catalogs-unittest-report"
+                  GallioRunnerType="IsolatedProcess"
+                  AssembliesToTest="$(BinDir)\test\Tekla.Structures.Catalogs.Test.dll"
+                  TeklaStructuresExecPath="$(BinDir)"
+                  ProduceCoverage="false"
+                  AttachDebugger="$(DEBUGON)"
+                  BreakBuildOnFailedTests="false"
+                  />
+    </Target>
+    
+    <Target Name="RunDialogTests">
+      <Message Text="UserSRCDir = $(UserSRCDir)"/> 
+      <Message Text="XSBIN = $(XSBIN)"/> 
+      <Message Text="XS_DIR = $(XS_DIR)"/> 
+      <NunitRunnerTask GallioPath="$(UserSRCDir)\MSBuild\BuildTools\Gallio\bin\Gallio.Echo.exe"
+                  NunitPath="$(UserSRCDir)\MSBuild\BuildTools\Nunit"
+                  OpenCoverPath="$(UserSRCDir)\MSBuild\BuildTools\OpenCover\OpenCover.Console.exe"
+                  TestRunner="Gallio"
+                  Processor="x86"
+                  GallioTestFilter=""
+                  NunitTestFilter=""                       
+                  OutputReportPaths="$(UserSRCDir)\MSBuild"
+                  CoverageReportFormat="dialog-coverage-report"
+                  UnitTestReportFormat="dialog-unittest-report"
+                  GallioRunnerType="IsolatedProcess"
+                  AssembliesToTest="$(BinDir)\test\Tekla.Structures.Dialog.Test.dll"
+                  TeklaStructuresExecPath="$(BinDir)"
+                  ProduceCoverage="false"
+                  AttachDebugger="$(DEBUGON)"
+                  BreakBuildOnFailedTests="false"
+                  />
+    </Target>    
+    
+    <Target Name="RunAnalysisTests">
+      <Message Text="UserSRCDir = $(UserSRCDir)"/> 
+      <Message Text="XSBIN = $(XSBIN)"/> 
+      <Message Text="XS_DIR = $(XS_DIR)"/> 
+      <NunitRunnerTask GallioPath="$(UserSRCDir)\MSBuild\BuildTools\Gallio\bin\Gallio.Echo.exe"
+                  NunitPath="$(UserSRCDir)\MSBuild\BuildTools\Nunit"
+                  OpenCoverPath="$(UserSRCDir)\MSBuild\BuildTools\OpenCover\OpenCover.Console.exe"
+                  TestRunner="Gallio"
+                  Processor="x86"
+                  GallioTestFilter=""
+                  NunitTestFilter=""
+                  OutputReportPaths="$(UserSRCDir)\MSBuild"
+                  CoverageReportFormat="analysis-coverage-report"
+                  UnitTestReportFormat="analysis-unittest-report"
+                  GallioRunnerType="IsolatedProcess"
+                  AssembliesToTest="$(BinDir)\test\Tekla.Structures.Analysis.Test.dll"
+                  TeklaStructuresExecPath="$(BinDir)"
+                  ProduceCoverage="false"
+                  AttachDebugger="$(DEBUGON)"
+                  BreakBuildOnFailedTests="false"
+                  />
+    </Target>
+    
+    <Target Name="RunModelComponentTests">
+      <Message Text="UserSRCDir = $(UserSRCDir)"/> 
+      <Message Text="XSBIN = $(XSBIN)"/> 
+      <Message Text="XS_DIR = $(XS_DIR)"/> 
+      <NunitRunnerTask GallioPath="$(UserSRCDir)\MSBuild\BuildTools\Gallio\bin\Gallio.Echo.exe"
+                  NunitPath="$(UserSRCDir)\MSBuild\BuildTools\Nunit"
+                  OpenCoverPath="$(UserSRCDir)\MSBuild\BuildTools\OpenCover\OpenCover.Console.exe"
+                  TestRunner="Gallio"
+                  Processor="x86"
+                  GallioTestFilter="Category: ComponentTests"
+                  NunitTestFilter="/include:ComponentTests"
+                  OutputReportPaths="$(UserSRCDir)\MSBuild"
+                  CoverageReportFormat="model-component-coverage-report"
+                  UnitTestReportFormat="model-component-unittest-report"
+                  GallioRunnerType="IsolatedProcess"
+                  AssembliesToTest="$(BinDir)\test\Tekla.Structures.Model.Test.dll"
+                  TeklaStructuresExecPath="$(BinDir)"
+                  ProduceCoverage="false"
+                  AttachDebugger="$(DEBUGON)"
+                  BreakBuildOnFailedTests="false"
+                  />
+    </Target>
+    
+    <Target Name="RunModelReferenceTests">
+      <Message Text="UserSRCDir = $(UserSRCDir)"/> 
+      <Message Text="XSBIN = $(XSBIN)"/> 
+      <Message Text="XS_DIR = $(XS_DIR)"/> 
+      <NunitRunnerTask GallioPath="$(UserSRCDir)\MSBuild\BuildTools\Gallio\bin\Gallio.Echo.exe"
+                  NunitPath="$(UserSRCDir)\MSBuild\BuildTools\Nunit"
+                  OpenCoverPath="$(UserSRCDir)\MSBuild\BuildTools\OpenCover\OpenCover.Console.exe"
+                  TestRunner="Gallio"
+                  Processor="x86"
+                  GallioTestFilter="Category: ReferenceModelTests"
+                  NunitTestFilter="/include:ReferenceModelTests"
+                  OutputReportPaths="$(UserSRCDir)\MSBuild"
+                  CoverageReportFormat="model-reference-coverage-report"
+                  UnitTestReportFormat="model-reference-unittest-report"
+                  GallioRunnerType="IsolatedProcess"
+                  AssembliesToTest="$(BinDir)\test\Tekla.Structures.Model.Test.dll"
+                  TeklaStructuresExecPath="$(BinDir)"
+                  ProduceCoverage="false"
+                  AttachDebugger="$(DEBUGON)"
+                  BreakBuildOnFailedTests="false"
+                  />
+    </Target>
+
+    <Target Name="RunModelViewTests">
+      <Message Text="UserSRCDir = $(UserSRCDir)"/> 
+      <Message Text="XSBIN = $(XSBIN)"/> 
+      <Message Text="XS_DIR = $(XS_DIR)"/> 
+      <NunitRunnerTask GallioPath="$(UserSRCDir)\MSBuild\BuildTools\Gallio\bin\Gallio.Echo.exe"
+                  NunitPath="$(UserSRCDir)\MSBuild\BuildTools\Nunit"
+                  OpenCoverPath="$(UserSRCDir)\MSBuild\BuildTools\OpenCover\OpenCover.Console.exe"
+                  TestRunner="Gallio"
+                  Processor="x86"
+                  GallioTestFilter="exclude Category: ReferenceModelTests,ComponentTests,ViewTest"
+                  NunitTestFilter="/exclude:ReferenceModelTests,ComponentTests,ViewTest"
+                  OutputReportPaths="$(UserSRCDir)\MSBuild"
+                  CoverageReportFormat="model-view-coverage-report"
+                  UnitTestReportFormat="model-view-unittest-report"
+                  GallioRunnerType="IsolatedProcess"
+                  AssembliesToTest="$(BinDir)\test\Tekla.Structures.Model.Test.dll"
+                  TeklaStructuresExecPath="$(BinDir)"
+                  ProduceCoverage="false"
+                  AttachDebugger="$(DEBUGON)"
+                  BreakBuildOnFailedTests="false"
+                  />
+    </Target>
+    
+    <Target Name="RunTSTests">
+      <Message Text="UserSRCDir = $(UserSRCDir)"/> 
+      <Message Text="XSBIN = $(XSBIN)"/> 
+      <Message Text="XS_DIR = $(XS_DIR)"/> 
+      <NunitRunnerTask GallioPath="$(UserSRCDir)\MSBuild\BuildTools\Gallio\bin\Gallio.Echo.exe"
+                  NunitPath="$(UserSRCDir)\MSBuild\BuildTools\Nunit"
+                  OpenCoverPath="$(UserSRCDir)\MSBuild\BuildTools\OpenCover\OpenCover.Console.exe"
+                  TestRunner="Gallio"
+                  Processor="x86"
+                  GallioTestFilter=""
+                  NunitTestFilter=""
+                  OutputReportPaths="$(UserSRCDir)\MSBuild"
+                  CoverageReportFormat="ts-coverage-report"
+                  UnitTestReportFormat="ts-unittest-report"
+                  GallioRunnerType="IsolatedProcess"
+                  AssembliesToTest="$(BinDir)\test\Tekla.Structures.Test.dll"
+                  TeklaStructuresExecPath="$(BinDir)"
+                  ProduceCoverage="false"
+                  AttachDebugger="$(DEBUGON)"
+                  BreakBuildOnFailedTests="false"
+                  />
+    </Target>
+    
+    <Target Name="RunContinuousBeamTests">
+      <Message Text="UserSRCDir = $(UserSRCDir)"/> 
+      <Message Text="XSBIN = $(XSBIN)"/> 
+      <Message Text="XS_DIR = $(XS_DIR)"/> 
+      <NunitRunnerTask GallioPath="$(UserSRCDir)\MSBuild\BuildTools\Gallio\bin\Gallio.Echo.exe"
+                  NunitPath="$(UserSRCDir)\MSBuild\BuildTools\Nunit"
+                  OpenCoverPath="$(UserSRCDir)\MSBuild\BuildTools\OpenCover\OpenCover.Console.exe"
+                  TestRunner="Gallio"
+                  Processor="x86"
+                  GallioTestFilter=""
+                  NunitTestFilter=""
+                  OutputReportPaths="$(UserSRCDir)\MSBuild"
+                  CoverageReportFormat="continuousbean-coverage-report"
+                  UnitTestReportFormat="continuousbean-unittest-report"
+                  GallioRunnerType="IsolatedProcess"
+                  AssembliesToTest="$(BinDir)\test\SiteManagerTests\ContinuousBeamReinforcement.Test.dll"
+                  TeklaStructuresExecPath="$(BinDir)"
+                  ProduceCoverage="false"
+                  AttachDebugger="$(DEBUGON)"
+                  BreakBuildOnFailedTests="false"
+                  />
+    </Target>    
+
+    <Target Name="RunDPMPrinterTests">
+      <Message Text="UserSRCDir = $(UserSRCDir)"/> 
+      <Message Text="XSBIN = $(XSBIN)"/> 
+      <Message Text="XS_DIR = $(XS_DIR)"/> 
+      <NunitRunnerTask GallioPath="$(UserSRCDir)\MSBuild\BuildTools\Gallio\bin\Gallio.Echo.exe"
+                  NunitPath="$(UserSRCDir)\MSBuild\BuildTools\Nunit"
+                  OpenCoverPath="$(UserSRCDir)\MSBuild\BuildTools\OpenCover\OpenCover.Console.exe"
+                  TestRunner="Gallio"
+                  Processor="x86"
+                  GallioTestFilter=""
+                  NunitTestFilter=""
+                  OutputReportPaths="$(UserSRCDir)\MSBuild"
+                  CoverageReportFormat="dpmprinter-coverage-report"
+                  UnitTestReportFormat="dpmprinter-unittest-report"
+                  GallioRunnerType="IsolatedProcess"
+                  AssembliesToTest="$(BinDir)\test\DPMPrinterTest\DPMPrinter.Test.dll"
+                  TeklaStructuresExecPath="$(BinDir)"
+                  ProduceCoverage="false"
+                  AttachDebugger="$(DEBUGON)"
+                  BreakBuildOnFailedTests="false"
+                  />
+    </Target>
+    
+    <Target Name="RunCMTests">
+      <Message Text="UserSRCDir = $(UserSRCDir)"/> 
+      <Message Text="XSBIN = $(XSBIN)"/> 
+      <Message Text="XS_DIR = $(XS_DIR)"/> 
+      <NunitRunnerTask GallioPath="$(UserSRCDir)\MSBuild\BuildTools\Gallio\bin\Gallio.Echo.exe"
+                  NunitPath="$(UserSRCDir)\MSBuild\BuildTools\Nunit"
+                  OpenCoverPath="$(UserSRCDir)\MSBuild\BuildTools\OpenCover\OpenCover.Console.exe"
+                  TestRunner="Gallio"
+                  Processor="x86"
+                  GallioTestFilter=""
+                  NunitTestFilter=""
+                  OutputReportPaths="$(UserSRCDir)\MSBuild"
+                  CoverageReportFormat="cmtests-coverage-report"
+                  UnitTestReportFormat="cmtests-unittest-report"
+                  GallioRunnerType="IsolatedProcess"
+                  AssembliesToTest="$(BinDir)\test\CMTests\ProjectOrganizer.Test.dll"
+                  TeklaStructuresExecPath="$(BinDir)"
+                  ProduceCoverage="false"
+                  AttachDebugger="$(DEBUGON)"
+                  BreakBuildOnFailedTests="false"
+                  />
+    </Target>
+
+    <Target Name="RunRebarLayeringTests">
+      <Message Text="UserSRCDir = $(UserSRCDir)"/> 
+      <Message Text="XSBIN = $(XSBIN)"/> 
+      <Message Text="XS_DIR = $(XS_DIR)"/> 
+      <NunitRunnerTask GallioPath="$(UserSRCDir)\MSBuild\BuildTools\Gallio\bin\Gallio.Echo.exe"
+                  NunitPath="$(UserSRCDir)\MSBuild\BuildTools\Nunit"
+                  OpenCoverPath="$(UserSRCDir)\MSBuild\BuildTools\OpenCover\OpenCover.Console.exe"
+                  TestRunner="Gallio"
+                  Processor="x86"
+                  GallioTestFilter=""
+                  NunitTestFilter=""
+                  OutputReportPaths="$(UserSRCDir)\MSBuild"
+                  CoverageReportFormat="RebarLayering-coverage-report"
+                  UnitTestReportFormat="RebarLayering-unittest-report"
+                  GallioRunnerType="IsolatedProcess"
+                  AssembliesToTest="$(BinDir)\test\DrawingsAppsTests\RebarLayeringMarker.Test.dll"
+                  TeklaStructuresExecPath="$(BinDir)"
+                  ProduceCoverage="false"
+                  AttachDebugger="$(DEBUGON)"
+                  BreakBuildOnFailedTests="false"
+                  />
+    </Target>
+    
+    <Target Name="RunSlabReingorcementTests">
+      <Message Text="UserSRCDir = $(UserSRCDir)"/> 
+      <Message Text="XSBIN = $(XSBIN)"/> 
+      <Message Text="XS_DIR = $(XS_DIR)"/> 
+      <NunitRunnerTask GallioPath="$(UserSRCDir)\MSBuild\BuildTools\Gallio\bin\Gallio.Echo.exe"
+                  NunitPath="$(UserSRCDir)\MSBuild\BuildTools\Nunit"
+                  OpenCoverPath="$(UserSRCDir)\MSBuild\BuildTools\OpenCover\OpenCover.Console.exe"
+                  TestRunner="Gallio"
+                  Processor="x86"
+                  GallioTestFilter=""
+                  NunitTestFilter=""
+                  OutputReportPaths="$(UserSRCDir)\MSBuild"
+                  CoverageReportFormat="SlabReingorcement-coverage-report"
+                  UnitTestReportFormat="SlabReingorcement-unittest-report"
+                  GallioRunnerType="IsolatedProcess"
+                  AssembliesToTest="$(BinDir)\test\SiteManagerTests\SlabReinforcementTool.Test.dll"
+                  TeklaStructuresExecPath="$(BinDir)"
+                  ProduceCoverage="false"
+                  AttachDebugger="$(DEBUGON)"
+                  BreakBuildOnFailedTests="false"
+                  />
+    </Target>
+    
+    <Target Name="RunTaskManagerTests">
+      <Message Text="UserSRCDir = $(UserSRCDir)"/> 
+      <Message Text="XSBIN = $(XSBIN)"/> 
+      <Message Text="XS_DIR = $(XS_DIR)"/> 
+      <NunitRunnerTask GallioPath="$(UserSRCDir)\MSBuild\BuildTools\Gallio\bin\Gallio.Echo.exe"
+                  NunitPath="$(UserSRCDir)\MSBuild\BuildTools\Nunit"
+                  OpenCoverPath="$(UserSRCDir)\MSBuild\BuildTools\OpenCover\OpenCover.Console.exe"
+                  TestRunner="Gallio"
+                  Processor="x86"
+                  GallioTestFilter=""
+                  NunitTestFilter=""
+                  OutputReportPaths="$(UserSRCDir)\MSBuild"
+                  CoverageReportFormat="TaskManager-coverage-report"
+                  UnitTestReportFormat="TaskManager-unittest-report"
+                  GallioRunnerType="IsolatedProcess"
+                  AssembliesToTest="$(BinDir)\test\SiteManagerTests\TaskManagerUnitTests.dll"
+                  TeklaStructuresExecPath="$(BinDir)"
+                  ProduceCoverage="false"
+                  AttachDebugger="$(DEBUGON)"
+                  BreakBuildOnFailedTests="false"
+                  />
+    </Target>  
+
+  <Target Name="CheckDirectManipulation">
+    <NunitRunnerTask GallioPath="$(UserSRCDir)\MSBuild\BuildTools\Gallio\bin\Gallio.Echo.exe"
+                NunitPath="$(UserSRCDir)\MSBuild\BuildTools\Nunit"
+                OpenCoverPath="$(UserSRCDir)\MSBuild\BuildTools\OpenCover\OpenCover.Console.exe"
+                TestRunner="Nunit"
+                Processor="x86"
+                GallioTestFilter=""
+                NunitTestFilter=""
+                OutputReportPaths="$(UserSRCDir)\DirectManipulation"
+                CoverageReportFormat="coverage-report"
+                UnitTestReportFormat="unittest-report"
+                GallioRunnerType="IsolatedProcess"                     
+                AssembliesToTest="$(UserBINDir)\$(ActualBinDir)\test\Tekla.BIM.Geometry.Test.dll;$(UserBINDir)\$(ActualBinDir)\test\Tekla.BIM.Internal.Test.dll;$(UserBINDir)\$(ActualBinDir)\test\Tekla.BIM.Utilities.Test.dll;$(UserBINDir)\$(ActualBinDir)\test\Tekla.BIM.DirectManipulation.Test.dll"
+                TeklaStructuresExecPath="$(UserBINDir)\$(ActualBinDir)"
+                ProduceCoverage="false"
+                AttachDebugger="false"
+                BreakBuildOnFailedTests="false"                     
+                  />
+  </Target>
+</Project>

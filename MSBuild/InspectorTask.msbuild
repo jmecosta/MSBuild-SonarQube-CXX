@@ -1,5 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="MemoryCheckAll" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\root_configuration.props"  Condition="$(UserSRCDir) == ''"/>
+  <PropertyGroup>
+    <InspectorOutput>E:\InspectorTest\</InspectorOutput>
+  </PropertyGroup>
+  
   <UsingTask TaskName="IntelInspectorTask" AssemblyFile="InspectorTask.dll" />
     <Target Name="MemoryCheckCustom">
         <IntelInspectorTask StackDepth="$(StackDepth)"
@@ -11,4 +16,17 @@
                             ResultFile="$(CsvOutFile)"
                         />
     </Target>
+    <Target Name="MemoryCheckCommon">
+    <IntelInspectorTask StackDepth="1"
+                        AnalysisType="mi1"
+                        ExecutableToRun="$(CustomExecutable)"
+                        ExecutableParameters="--gtest_color=no"
+                        PathToIntelInspector="C:\Program Files (x86)\Intel\Inspector XE 2013"
+                        ExecutableEnvironment="TEAMCITY_PROJECT_NAME=output, please"
+                        ResultFile="$(InspectorOutput)\Common.xml"
+                        />
+  </Target>
+  <Target Name="MemoryCheckAll"
+          DependsOnTargets="MemoryCheckCommon" />
+
 </Project>

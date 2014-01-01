@@ -231,7 +231,7 @@ type CppLintTask() as this =
                 ()
 
             let iterateOverProjectFiles(projectFile : ProjectFiles) = 
-                projectHelper.GetCppCompilationFiles(projectFile.path, "", x.PathReplacementStrings)  |> Seq.iter (fun x -> iterateOverFiles x projectFile.path)
+                projectHelper.GetCompilationFiles(projectFile.path, "", x.PathReplacementStrings)  |> Seq.iter (fun x -> iterateOverFiles x projectFile.path)
 
             solutionHelper.GetProjectFilesFromSolutions(x.SolutionPathToAnalyse) |> Seq.iter (fun x -> iterateOverProjectFiles x)
 

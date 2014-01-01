@@ -1,13 +1,195 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="CheckCore" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="GtestXunitConverterCheckCustom" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\root_configuration.props"/>
     <UsingTask TaskName="GtestXunitConverterTask" AssemblyFile="GtestXunitConverterTask.dll"/>
     <Target Name="GtestXunitConverterCheckCustom">
-        <GtestXunitConverterTask SolutionPathToAnalyse="$(UserSolutionPathToAnalyse)"
-                  TestSuffix="$(UserTestSuffix)"
-                  GtestXMLReportFile="$(UserXmlReportPath)"
-                  GtestXunitConverterOutputPath="$(UserXmlOutputPath)"
+        <GtestXunitConverterTask SolutionPathToAnalyse="$(SolutionPathToAnalyse)"
+                  TestSuffix="$(TestSuffix)"
+                  GtestXMLReportFile="$(GtestXMLReportFile)"
+                  GtestXunitConverterOutputPath="$(GtestXunitConverterOutputPath)"
+                  PathReplacementStrings="$(PathReplacementStrings)"
+                  SkipSearchForFileLocation="$(SkipSearchForFileLocation)"
+                  RunTests="$(RunTests)"
+                  GtestExeFile="$(GtestExeFile)"
+                  ExtraArgumentsToGtestExe="$(ExtraArgumentsToGtestExe)"
+                  Shuffle="$(Shuffle)"
+                  SeedStart="$(SeedStart)"
+                  SeedEnd="$(SeedEnd)"/>
+    </Target>
+  
+    <Target Name="GtestShuffler">
+        <GtestXunitConverterTask 
+                  GtestXunitConverterOutputPath="$(BinDir)\reports\shuffle\$(GtestExeFile).xml"
+                  SkipSearchForFileLocation="true"
+                  RunTests="true"
+                  GtestExeFile="$(BinDir)\$(GtestExeFile)"
+                  Shuffle="true"
+                  SeedStart="$(SeedStart)"
+                  SeedEnd="$(SeedEnd)"/>
+    </Target>  
+  
+    <Target Name="CheckGtestXunitConverterCommonXML">
+        <GtestXunitConverterTask SolutionPathToAnalyse="$(UserSRCDir)\Core\Common\Common.sln"
+                  TestSuffix="_tests.cpp;_test.cpp"
+                  GtestXMLReportFile="$(UserBINDir)\bin_x64\test_reports\gtest_X64DAYCommon.xml"
+                  GtestXunitConverterOutputPath="$(UserSRCDir)\Core\Common\.sonar\reports-xunit"
                   PathReplacementStrings="$(UserPathReplacementStrings)"
-                  SkipSearchForFileLocation="$(UserSkipSearchForFileLocation)"
                       />
     </Target>
+  <Target Name="CheckGtestXunitConverterAnalysisXML">
+    <GtestXunitConverterTask SolutionPathToAnalyse="$(UserSRCDir)\Core\Analysis\Analysis.sln"
+                  TestSuffix="_tests.cpp;_test.cpp"
+                  GtestXMLReportFile="$(UserBINDir)\bin_x64\test_reports\gtest_X64DAYAnalysis.xml"
+                  GtestXunitConverterOutputPath="$(UserSRCDir)\Core\Analysis\.sonar\reports-xunit"
+                  PathReplacementStrings="$(UserPathReplacementStrings)"
+                      />
+  </Target>
+  <Target Name="CheckGtestXunitConverterCatalogsXML">
+    <GtestXunitConverterTask SolutionPathToAnalyse="$(UserSRCDir)\Core\Catalogs\Catalogs.sln"
+                  TestSuffix="_tests.cpp;_test.cpp"
+                  GtestXMLReportFile="$(UserBINDir)\bin_x64\test_reports\gtest_X64DAYCatalogs.xml"
+                  GtestXunitConverterOutputPath="$(UserSRCDir)\Core\Catalogs\.sonar\reports-xunit"
+                  PathReplacementStrings="$(UserPathReplacementStrings)"
+                      />
+  </Target>
+  <Target Name="CheckGtestXunitConverterDimensioningXML">
+    <GtestXunitConverterTask SolutionPathToAnalyse="$(UserSRCDir)\Core\Dimensioning\Dimensioning.sln"
+                  TestSuffix="_tests.cpp;_test.cpp"
+                  GtestXMLReportFile="$(UserBINDir)\bin_x64\test_reports\gtest_X64DAYDimensioning.xml"
+                  GtestXunitConverterOutputPath="$(UserSRCDir)\Core\Dimensioning\.sonar\reports-xunit"
+                  PathReplacementStrings="$(UserPathReplacementStrings)"
+                      />
+  </Target>
+  <Target Name="CheckGtestXunitConverterDrawingsXML">
+    <GtestXunitConverterTask SolutionPathToAnalyse="$(UserSRCDir)\Core\Drawings\Drawings.sln"
+                  TestSuffix="_tests.cpp;_test.cpp"
+                  GtestXMLReportFile="$(UserBINDir)\bin_x64\test_reports\gtest_X64DAYDrawings.xml"
+                  GtestXunitConverterOutputPath="$(UserSRCDir)\Core\Drawings\.sonar\reports-xunit"
+                  PathReplacementStrings="$(UserPathReplacementStrings)"
+                      />
+  </Target>
+  <Target Name="CheckGtestXunitConverterEnvironmentXML">
+    <GtestXunitConverterTask SolutionPathToAnalyse="$(UserSRCDir)\Core\Environment\Environment.sln"
+                  TestSuffix="_tests.cpp;_test.cpp"
+                  GtestXMLReportFile="$(UserBINDir)\bin_x64\test_reports\gtest_X64DAYEnvironment.xml"
+                  GtestXunitConverterOutputPath="$(UserSRCDir)\Core\Environment\.sonar\reports-xunit"
+                  PathReplacementStrings="$(UserPathReplacementStrings)"
+                      />
+  </Target>
+  <Target Name="CheckGtestXunitConverterModelXML">
+    <GtestXunitConverterTask SolutionPathToAnalyse="$(UserSRCDir)\Core\Model\Model.sln"
+                  TestSuffix="_tests.cpp;_test.cpp"
+                  GtestXMLReportFile="$(UserBINDir)\bin_x64\test_reports\gtest_X64DAYModel.xml"
+                  GtestXunitConverterOutputPath="$(UserSRCDir)\Core\Model\.sonar\reports-xunit"
+                  PathReplacementStrings="$(UserPathReplacementStrings)"
+                      />
+  </Target>
+  <Target Name="CheckGtestXunitConverterSolidsXML">
+    <GtestXunitConverterTask SolutionPathToAnalyse="$(UserSRCDir)\Core\Solids\Solids.sln"
+                  TestSuffix="_tests.cpp;_test.cpp"
+                  GtestXMLReportFile="$(UserBINDir)\bin_x64\test_reports\gtest_X64DAYSolids.xml"
+                  GtestXunitConverterOutputPath="$(UserSRCDir)\Core\Solids\.sonar\reports-xunit"
+                  PathReplacementStrings="$(UserPathReplacementStrings)"
+                      />
+  </Target>
+  <Target Name="CheckGtestXunitConverterTeklaStructuresXML">
+    <GtestXunitConverterTask SolutionPathToAnalyse="$(UserSRCDir)\Core\TeklaStructures\TeklaStructures.sln"
+                  TestSuffix="_tests.cpp;_test.cpp"
+                  GtestXMLReportFile="$(UserBINDir)\bin_x64\test_reports\gtest_X64DAYTS.xml"
+                  GtestXunitConverterOutputPath="$(UserSRCDir)\Core\TeklaStructures\.sonar\reports-xunit"
+                  PathReplacementStrings="$(UserPathReplacementStrings)"
+                             />
+  </Target>
+  <Target Name="CheckGtestXunitConverterModelTesterXML">
+    <GtestXunitConverterTask SolutionPathToAnalyse="$(UserSRCDir)\Test\ModelTester\ModelTester.sln"
+                  TestSuffix=""
+                  GtestXMLReportFile="$(UserBINDir)\bin_x64\MTreps\*.xml"
+                  GtestXunitConverterOutputPath="$(UserSRCDir)\Test\ModelTester\.sonar\reports-xunit"
+                  PathReplacementStrings="$(UserPathReplacementStrings)"
+                             />
+  </Target>
+
+
+  <Target Name="RunGtestAndXunitConverterCommonXML">
+    <GtestXunitConverterTask SolutionPathToAnalyse="$(UserSRCDir)\Core\Common\Common.sln"
+                  TestSuffix="_tests.cpp;_test.cpp"
+                  RunTests="true"                             
+                  GtestExeFile="$(BinDir)\CommonTests.exe"
+                  GtestXunitConverterOutputPath="$(UserSRCDir)\Core\Common\.sonar\reports-xunit"
+                  PathReplacementStrings="$(UserPathReplacementStrings)"
+                      />
+  </Target>
+  <Target Name="RunGtestAndXunitConverterAnalysisXML">
+    <GtestXunitConverterTask SolutionPathToAnalyse="$(UserSRCDir)\Core\Analysis\Analysis.sln"
+                  TestSuffix="_tests.cpp;_test.cpp"
+                  RunTests="true"                             
+                  GtestExeFile="$(BinDir)\AnalysisTests.exe"
+                  GtestXunitConverterOutputPath="$(UserSRCDir)\Core\Analysis\.sonar\reports-xunit"
+                  PathReplacementStrings="$(UserPathReplacementStrings)"
+                      />
+  </Target>
+  <Target Name="RunGtestAndXunitConverterCatalogsXML">
+    <GtestXunitConverterTask SolutionPathToAnalyse="$(UserSRCDir)\Core\Catalogs\Catalogs.sln"
+                  TestSuffix="_tests.cpp;_test.cpp"
+                  RunTests="true"                             
+                  GtestExeFile="$(BinDir)\CatalogsTests.exe"
+                  GtestXunitConverterOutputPath="$(UserSRCDir)\Core\Catalogs\.sonar\reports-xunit"
+                  PathReplacementStrings="$(UserPathReplacementStrings)"
+                      />
+  </Target>
+  <Target Name="RunGtestAndXunitConverterDimensioningXML">
+    <GtestXunitConverterTask SolutionPathToAnalyse="$(UserSRCDir)\Core\Dimensioning\Dimensioning.sln"
+                  TestSuffix="_tests.cpp;_test.cpp"
+                  RunTests="true"                             
+                  GtestExeFile="$(BinDir)\DimensioningTests.exe"
+                  GtestXunitConverterOutputPath="$(UserSRCDir)\Core\Dimensioning\.sonar\reports-xunit"
+                  PathReplacementStrings="$(UserPathReplacementStrings)"
+                      />
+  </Target>
+  <Target Name="RunGtestAndXunitConverterDrawingsXML">
+    <GtestXunitConverterTask SolutionPathToAnalyse="$(UserSRCDir)\Core\Drawings\Drawings.sln"
+                  TestSuffix="_tests.cpp;_test.cpp"
+                  RunTests="true"                             
+                  GtestExeFile="$(BinDir)\DrawingsTests.exe"
+                  GtestXunitConverterOutputPath="$(UserSRCDir)\Core\Drawings\.sonar\reports-xunit"
+                  PathReplacementStrings="$(UserPathReplacementStrings)"
+                      />
+  </Target>
+  <Target Name="RunGtestAndXunitConverterEnvironmentXML">
+    <GtestXunitConverterTask SolutionPathToAnalyse="$(UserSRCDir)\Core\Environment\Environment.sln"
+                  TestSuffix="_tests.cpp;_test.cpp"
+                  RunTests="true"                             
+                  GtestExeFile="$(BinDir)\EnvironmentTests.exe"
+                  GtestXunitConverterOutputPath="$(UserSRCDir)\Core\Environment\.sonar\reports-xunit"
+                  PathReplacementStrings="$(UserPathReplacementStrings)"
+                      />
+  </Target>
+  <Target Name="RunGtestAndXunitConverterModelXML">
+    <GtestXunitConverterTask SolutionPathToAnalyse="$(UserSRCDir)\Core\Model\Model.sln"
+                  TestSuffix="_tests.cpp;_test.cpp"
+                  RunTests="true"                             
+                  GtestExeFile="$(BinDir)\ModelTests.exe"
+                  GtestXunitConverterOutputPath="$(UserSRCDir)\Core\Model\.sonar\reports-xunit"
+                  PathReplacementStrings="$(UserPathReplacementStrings)"
+                      />
+  </Target>
+  <Target Name="RunGtestAndXunitConverterSolidsXML">
+    <GtestXunitConverterTask SolutionPathToAnalyse="$(UserSRCDir)\Core\Solids\Solids.sln"
+                  TestSuffix="_tests.cpp;_test.cpp"
+                  RunTests="true"                             
+                  GtestExeFile="$(BinDir)\SolidsTests.exe"
+                  GtestXunitConverterOutputPath="$(UserSRCDir)\Core\Solids\.sonar\reports-xunit"
+                  PathReplacementStrings="$(UserPathReplacementStrings)"
+                      />
+  </Target>
+  <Target Name="RunGtestAndXunitConverterTeklaStructuresXML">
+    <GtestXunitConverterTask SolutionPathToAnalyse="$(UserSRCDir)\Core\TeklaStructures\TeklaStructures.sln"
+                  TestSuffix="_tests.cpp;_test.cpp"
+                  RunTests="true"
+                  GtestExeFile="$(BinDir)\TSTests.exe"
+                  GtestXunitConverterOutputPath="$(UserSRCDir)\Core\TeklaStructures\.sonar\reports-xunit"
+                  PathReplacementStrings="$(UserPathReplacementStrings)"
+                             />
+  </Target>
+
 </Project>

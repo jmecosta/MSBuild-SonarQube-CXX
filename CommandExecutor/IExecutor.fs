@@ -1,6 +1,7 @@
 ﻿namespace MSBuild.Tekla.Tasks.Executor
 
 open System
+open System.IO
 open System.Threading
 open System.Diagnostics
 open Microsoft.FSharp.Collections
@@ -20,10 +21,12 @@ type ICommandExecutor =
 
   // no redirection of output
   abstract member ExecuteCommand : string * string * Map<string, string> -> int
+
   // with redirection of output
-  abstract member ExecuteCommand : string * string * Map<string, string> * (DataReceivedEventArgs -> unit) * (DataReceivedEventArgs -> unit) -> int
+  abstract member ExecuteCommand : string * string * Map<string, string> * (DataReceivedEventArgs -> unit) * (DataReceivedEventArgs -> unit) * string -> int
 
 type CommandExecutor(logger : TaskLoggingHelper, timeout : int64) =
+    let addEnvironmentVariable (startInfo:ProcessStartInfo) a b = startInfo.EnvironmentVariables.Add(a, b)
     member val Logger = logger
     member val stopWatch = Stopwatch.StartNew()
     member val proc : Process  = new Process() with get, set
@@ -36,8 +39,14 @@ type CommandExecutor(logger : TaskLoggingHelper, timeout : int64) =
         async {
           while not this.cancelSignal do
             if this.stopWatch.ElapsedMilliseconds > timeout then
-                logger.LogError(sprintf "Expired Timer: %x " this.stopWatch.ElapsedMilliseconds)
-                this.proc.Kill()
+
+                if not(obj.ReferenceEquals(logger, null)) then
+                    logger.LogError(sprintf "Expired Timer: %x " this.stopWatch.ElapsedMilliseconds)
+
+                try
+                    this.proc.Kill()
+                with
+                | ex -> ()
                 this.returncode <- ReturnCode.Timeout
             Thread.Sleep(1000)
         }
@@ -65,7 +74,12 @@ type CommandExecutor(logger : TaskLoggingHelper, timeout : int64) =
             this.returncode
 
         member this.CancelExecution =
-            this.proc.Kill()
+            if this.proc.HasExited = false then
+                try
+                    this.proc.Kill()
+                with
+                | ex -> ()
+
             this.cancelSignal <- true
             ReturnCode.Ok
 
@@ -82,13 +96,11 @@ type CommandExecutor(logger : TaskLoggingHelper, timeout : int64) =
                                              RedirectStandardOutput = true,
                                              RedirectStandardError = true,
                                              RedirectStandardInput = true,
-                                             CreateNoWindow = true)
+                                             CreateNoWindow = true,
+                                             WorkingDirectory = Path.GetDirectoryName(program))
+            env |> Map.iter (addEnvironmentVariable startInfo)
 
-            for i in env do
-                startInfo.EnvironmentVariables.Add(i.Key, i.Value)
-
-            this.proc <- new Process()
-            this.proc.StartInfo <- startInfo
+            this.proc <- new Process(StartInfo = startInfo)
             this.proc.ErrorDataReceived.Add(this.ProcessErrorDataReceived)
             this.proc.OutputDataReceived.Add(this.ProcessOutputDataReceived)
 
@@ -105,7 +117,7 @@ type CommandExecutor(logger : TaskLoggingHelper, timeout : int64) =
             this.proc.ExitCode
 
 
-        member this.ExecuteCommand(program, args, env, outputHandler, errorHandler) =
+        member this.ExecuteCommand(program, args, env, outputHandler, errorHandler, workingDir) =               
             let startInfo = ProcessStartInfo(FileName = program,
                                              Arguments = args,
                                              WindowStyle = ProcessWindowStyle.Normal,
@@ -113,15 +125,14 @@ type CommandExecutor(logger : TaskLoggingHelper, timeout : int64) =
                                              RedirectStandardOutput = true,
                                              RedirectStandardError = true,
                                              RedirectStandardInput = true,
-                                             CreateNoWindow = true)
-            for i in env do
-                startInfo.EnvironmentVariables.Add(i.Key, i.Value)
+                                             CreateNoWindow = true,
+                                             WorkingDirectory = workingDir)
+            env |> Map.iter (addEnvironmentVariable startInfo)
 
-            this.proc <- new Process()
-            this.proc.StartInfo <- startInfo
+            this.proc <- new Process(StartInfo = startInfo,
+                                     EnableRaisingEvents = true)
             this.proc.OutputDataReceived.Add(outputHandler)
             this.proc.ErrorDataReceived.Add(errorHandler)
-            this.proc.EnableRaisingEvents <- true
             let ret = this.proc.Start()
 
             this.stopWatch.Restart()

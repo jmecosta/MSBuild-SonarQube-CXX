@@ -9,6 +9,7 @@ namespace MSBuild.Tekla.Tasks.GtestXunitConverter
 open FSharp.Data
 open System
 open System.IO
+open System.Xml
 open System.Xml.Linq
 open System.Diagnostics
 open Microsoft.Build
@@ -17,11 +18,24 @@ open Microsoft.Build.Logging
 open Microsoft.Build.Utilities
 open Microsoft.Win32
 open MSBuild.Tekla.Tasks.MsbuildTaskUtils
+open MSBuild.Tekla.Tasks.Executor
 
 type GtestXmlReport = XmlProvider<"""<?xml version="1.0" encoding="UTF-8"?>
 <testsuites tests="43" failures="0" disabled="2" errors="0" timestamp="2013-06-29T09:23:30" time="0.348" name="AllTests">
   <testsuite name="MD_GetMac" tests="1" failures="0" disabled="0" errors="0" time="0">
     <testcase name="ReturnsMacAddress" status="notrun" time="0" classname="MD_GetMac" /> 
+  </testsuite>
+  <testsuite name="MD_coPolygonCutTest" tests="4" failures="1" disabled="0" errors="0" time="0">
+    <testcase name="GetObjectType" status="run" time="0" classname="MD_coPolygonCutTest" />
+    <testcase name="GetObjectClass" status="run" time="0" classname="MD_coPolygonCutTest" />
+    <testcase name="GetPartForm" status="run" time="0" classname="MD_coPolygonCutTest" />
+    <testcase name="SetUIInputForPolygonCut" status="run" time="0" classname="MD_coPolygonCutTest">
+      <failure message="e:\prod\structures\src\work\core\model\libco_classes\test\co_polygon_cut_test.cpp:73&#x0A;Value of: RefCoordsys[3]&#x0A;Expected: Vector Check Failed&#x0A;  Actual: 24-byte object &lt;CC-CC CC-CC CC-CC CC-CC 01-CC CC-CC 00-00 00-00 CC-CC CC-CC 00-00 00-00&gt; (of type class Vector_c)&#x0A;Incorrect coordsys after SetUIInputItem" type=""><![CDATA[e:\prod\structures\src\work\core\model\libco_classes\test\co_polygon_cut_test.cpp:73
+Value of: RefCoordsys[3]
+Expected: Vector Check Failed
+  Actual: 24-byte object <CC-CC CC-CC CC-CC CC-CC 01-CC CC-CC 00-00 00-00 CC-CC CC-CC 00-00 00-00> (of type class Vector_c)
+Incorrect coordsys after SetUIInputItem]]></failure>
+    </testcase>
   </testsuite>
   <testsuite name="CM_toolFileSystemTest" tests="34" failures="0" disabled="0" errors="0" time="0.128">
     <testcase name="DISABLED_TT80570_TestgeoSolveExtremaSpatialRelation_5" status="notrun" time="0" classname="CM_geoExtremaTest" />
@@ -61,7 +75,7 @@ type GtestXmlReport = XmlProvider<"""<?xml version="1.0" encoding="UTF-8"?>
     <testcase name="testInsertInCache_FileDoesNotExist" status="run" time="0.002" classname="CM_toolFileSystemTest" />
     <testcase name="GetFileFullPath_ShouldNotReturnNullDString_c" status="run" time="0.003" classname="CM_toolFileSystemTest" />
   </testsuite>
-  <testsuite name="CM_toolFileSystemJapaneseTest" tests="6" failures="0" disabled="0" errors="0" time="0.021">
+  <testsuite name="CM_toolFileSystemJapaneseTest" tests="6" failures="4" disabled="0" errors="0" time="0.021">
     <testcase name="testFileSystemGets_FilesWithSuffixFromSubFolder" status="run" time="0.004" classname="CM_toolFileSystemJapaneseTest" />
     <testcase name="testFileSystem_GetFullPathTo" status="run" time="0.004" classname="CM_toolFileSystemJapaneseTest" />
     <testcase name="testTransform" status="run" time="0.003" classname="CM_toolFileSystemJapaneseTest" />
@@ -74,35 +88,21 @@ type GtestXmlReport = XmlProvider<"""<?xml version="1.0" encoding="UTF-8"?>
   </testsuite>
   </testsuites>""">
 
-type TestCase(name:string, status:string, time:string, classname:string) = 
-    member val name = name
-    member val status = status
-    member val time = time
-    member val classname = classname
-
-type TestSuite(suitename:string, tests:string, disabled:string, errors:string, time:string) =
-    member val suitename = suitename
-    member val tests = tests
-    member val disabled = disabled
-    member val errors = errors
-    member val time = time
-
-    member val testcases : TestCase list = [] with get, set
-
-    member this.AddTestCase(case : TestCase) =
-        this.testcases <- this.testcases @ [case]
-
 type GtestXunitConverterTask() as this =
     inherit Task()
     let logger : TaskLoggingHelper = new TaskLoggingHelper(this)
+    let executor : CommandExecutor = new CommandExecutor(logger, int64(1500000))
 
+    member val CurrentSeed : string = "" with get, set
+    member val PreviousMessage : string = "" with get, set
+    member val Actual : string = "" with get, set    
+    member val Expected : string = "" with get, set
     member val buildok : bool = true with get, set
     member val counterFile : int = 0 with get, set
     member val ToOutputData : string list = [] with get, set
     member val testFiles : string list = [] with get, set
 
     /// Solution Path, Required
-    [<Required>]
     member val SolutionPathToAnalyse = "" with get, set
 
     /// Output Path, Required
@@ -110,7 +110,6 @@ type GtestXunitConverterTask() as this =
     member val GtestXunitConverterOutputPath = "" with get, set
 
     /// Input report file Path, Required
-    [<Required>]
     member val GtestXMLReportFile = "" with get, set
 
     /// path for GtestXunitConverter executable, default expects GtestXunitConverter in path
@@ -119,8 +118,20 @@ type GtestXunitConverterTask() as this =
     /// path replacement strings
     member val PathReplacementStrings = "" with get, set
 
-/// path replacement strings
+    /// path replacement strings
     member val SkipSearchForFileLocation = false with get, set
+
+    /// Exe with test files
+    member val GtestExeFile = "" with get, set
+
+    member val ExtraArgumentsToGtestExe = "" with get, set
+
+    member val Shuffle = false with get, set
+    member val SeedStart = 1 with get, set
+    member val SeedEnd = 1 with get, set
+
+    /// If True GtestExe Needs to be given
+    member val RunTests = false with get, set
 
     member x.ParseXunitReport filePath = 
         let xunitReport = GtestXmlReport.Parse(File.ReadAllText(filePath))
@@ -132,27 +143,26 @@ type GtestXunitConverterTask() as this =
             wr.WriteLine(line)
 
         let getFileNameFromListOfFile className =
-            let mutable filefound = false
-            let mutable fileout = ""
-            for file in this.testFiles do
-                if not(filefound) then
-                    if File.Exists(file) then
-                        let lines = File.ReadAllText(file)
-                        let lineswithoutspaces = lines.Replace(" ", "")
-                        if lineswithoutspaces.Contains("TEST_F(" + className) || lineswithoutspaces.Contains("TEST(" + className) then
-                            filefound <- true
-                            fileout <- file
+            let checkPresenceOfTest(filePath : string) = 
+                let lineswithoutspaces = File.ReadAllText(filePath).Replace(" ", "")
+                lineswithoutspaces.Contains("TEST_F(" + className) || lineswithoutspaces.Contains("TEST(" + className)
+                   
+            (List.toArray this.testFiles) |> Array.find (fun elem -> checkPresenceOfTest(elem)) 
 
-            fileout
-                    
+        let XmlEscape(unescaped : string) =
+            let doc = new XmlDocument()
+            let node = doc.CreateElement("root")
+            node.InnerText <- unescaped
+            node.InnerXml
+
         for testSuite in xunitReport.GetTestsuites() do
-            let mutable skipCase = true
-            for testcase in testSuite.GetTestcases() do
-                if testcase.Status.Equals("run") then
-                    skipCase <- false                
+                             
+            if (testSuite.GetTestcases() |> Array.exists (fun case -> case.Status.Equals("run"))) then
 
-            if not(skipCase) then
                 let xml_file = Path.Combine(x.GtestXunitConverterOutputPath, String.Concat(String.Concat("xunit-result-", this.counterFile),".xml"))
+                if File.Exists(xml_file) then
+                    File.Delete(xml_file)
+
                 this.counterFile <- this.counterFile + 1
                 addLine("""<?xml version="1.0" encoding="UTF-8"?>""", xml_file)
                 let mutable fileName = ""
@@ -161,33 +171,124 @@ type GtestXunitConverterTask() as this =
 
                 let suitestr = sprintf """<testsuite name="%s" tests="%i" failures="%i" disabled="%i" errors="%i" time="%f" filename="%s">""" testSuite.Name testSuite.Tests testSuite.Failures testSuite.Disabled testSuite.Errors testSuite.Time fileName
                 addLine(suitestr, xml_file)
-                for testcase in testSuite.GetTestcases() do                          
-                    let casestr = sprintf """   <testcase name="%s" status="%s" time="%f" classname="%s" />""" testcase.Name testcase.Status testcase.Time testcase.Classname
-                    addLine(casestr, xml_file)
+                for testcase in testSuite.GetTestcases() do                                        
+                    try
+                        let casestr = sprintf """   <testcase name="%s" status="%s" time="%f" classname="%s" >""" testcase.Name testcase.Status testcase.Time testcase.Classname                        
+                        let message = XmlEscape testcase.Failure.Message
+                        let unscape = message.Replace("\"", "&quot;")
+                        let failurestr = sprintf """<failure message="%s" type="%s"><![CDATA[%s]]></failure>""" unscape testcase.Failure.Type (XmlEscape testcase.Failure.Value)
+                        addLine(casestr, xml_file)
+                        addLine(failurestr, xml_file)
+                        addLine("""   </testcase>""", xml_file)
+                    with
+                    | ex -> 
+                        let casestr = sprintf """   <testcase name="%s" status="%s" time="%f" classname="%s" />""" testcase.Name testcase.Status testcase.Time testcase.Classname
+                        addLine(casestr, xml_file)
+                        ()
+
                 addLine("""</testsuite>""", xml_file)                 
         ()
+
+    member x.generateCommandLineArgs seed =
+        let builder = new CommandLineBuilder()
+        if String.IsNullOrEmpty(seed) then
+            x.GtestXMLReportFile <- x.GtestExeFile + ".xml"
+        else
+            x.GtestXMLReportFile <- x.GtestExeFile + "." + seed + ".xml"
+            builder.AppendSwitch("--gtest_shuffle")     
+            builder.AppendSwitch("--gtest_random_seed=" + seed)
+
+        if not(String.IsNullOrEmpty(x.ExtraArgumentsToGtestExe)) then
+            builder.AppendSwitch(x.ExtraArgumentsToGtestExe)
+
+        builder.AppendSwitch("--gtest_output=xml:" + x.GtestXMLReportFile)        
+        builder.ToString()
+
+    member x.ProcessOutputDataReceived(e : DataReceivedEventArgs) = 
+        if not(String.IsNullOrWhiteSpace(e.Data))  then
+            if Environment.GetEnvironmentVariable("TEAMCITY_PROJECT_NAME") = null || Environment.GetEnvironmentVariable("TEAMCITY_PROJECT_NAME").Equals("NOT FOUND") then
+                if e.Data.Contains("[ FAILED        ]") || e.Data.Contains("[  FAILED  ] ") || e.Data.Contains("SEH exception with code") then
+                    try
+                        if e.Data.Contains("SEH exception with code") then
+                            logger.LogError(e.Data)
+                        // c:\prod\structures\src\work\core\common\libtransform\test\transform_vector_test.cpp(40): error : Value of: Vector_c(-0.0, -1.0, -1.0)
+                        // transform_vector_test.cpp(40): error : Value of: Vector_c(-0.0, -1.0, -1.0)
+                        else if not(String.IsNullOrEmpty(x.PreviousMessage)) then
+                            let elemsName = x.PreviousMessage.Split("(".ToCharArray())
+                            let line = System.Int32.Parse(elemsName.[1].Split(")".ToCharArray()).[0])
+                            let msg = x.PreviousMessage.Replace(elemsName.[0] + "(" + line.ToString() + "): error :", "")
+              
+                            if x.Shuffle then
+                                logger.LogError("", "", "", elemsName.[0], line, 0, line, 0, "SEED Error: " + x.CurrentSeed + " : " + msg + "\n" + x.Expected + "\n" + x.Actual)
+                            else
+                                logger.LogError("", "", "", elemsName.[0], line, 0, line, 0, msg + "\n" + x.Expected + "\n" + x.Actual)
+
+                            x.Expected <- ""
+                            x.Actual <- ""
+                            x.PreviousMessage <- ""
+                    with :? System.Exception as e ->
+                        logger.LogWarning(e.Message + " " + e.StackTrace + "\n" + e.Source + "\n" +  e.TargetSite.ToString() + "\n" +  e.HelpLink )                                                                                      
+                else
+                    if e.Data.Contains("Expected: ") then
+                        x.Expected <- e.Data
+                    elif e.Data.Contains("  Actual: ") then
+                        x.Actual <- e.Data
+                    else
+                        let failedFile = e.Data.Split("(".ToCharArray()).[0]
+                        if not(String.IsNullOrEmpty(failedFile)) && File.Exists(failedFile) then
+                            x.PreviousMessage <- e.Data
+                                        
+            logger.LogMessage(MessageImportance.High, e.Data)
+
+    member x.ExecuteTests executor =
+        let env = Map.ofList [("CPPCHECK_INPUT", x.GtestExeFile)]
+
+        let mutable returncode = 0
+        if not(x.Shuffle) then
+            if not(this.BuildEngine = null) then
+                logger.LogMessage(sprintf "gtest: %s %s" x.GtestExeFile (x.generateCommandLineArgs ""))
+            returncode <- (executor :> ICommandExecutor).ExecuteCommand(x.GtestExeFile, (x.generateCommandLineArgs ""), env, x.ProcessOutputDataReceived, x.ProcessOutputDataReceived, Directory.GetParent(x.GtestExeFile).ToString())
+            if File.Exists(x.GtestXMLReportFile) then
+                this.ParseXunitReport x.GtestXMLReportFile
+        else
+            for i in x.SeedStart .. x.SeedEnd do
+                x.CurrentSeed <- i.ToString()
+                if not(this.BuildEngine = null) then
+                    logger.LogMessage(sprintf "gtest: %s %s" x.GtestExeFile (x.generateCommandLineArgs(i.ToString())))
+                returncode <- (executor :> ICommandExecutor).ExecuteCommand(x.GtestExeFile, x.generateCommandLineArgs(i.ToString()), env, x.ProcessOutputDataReceived, x.ProcessOutputDataReceived, Directory.GetParent(x.GtestExeFile).ToString())
+                if File.Exists(x.GtestXMLReportFile) then
+                    this.ParseXunitReport x.GtestXMLReportFile
+
+        if Environment.GetEnvironmentVariable("TEAMCITY_PROJECT_NAME") = null then           
+            returncode = 0
+        else
+            true            
 
     override x.Execute() =
 
         let mutable result = not(logger.HasLoggedErrors)
         if result then
             let stopWatchTotal = Stopwatch.StartNew()
-            let solutionHelper = new VSSolutionUtils()
-            let projectHelper = new VSProjectUtils()
 
             if Directory.Exists(x.GtestXunitConverterOutputPath) then
                 for filename in Directory.GetFiles(x.GtestXunitConverterOutputPath, @"xunit-result-*.xml", SearchOption.AllDirectories) do
                     File.Delete(filename)
             else
+                logger.LogMessage(sprintf "Create New Folder: %s " x.GtestXunitConverterOutputPath)
                 Directory.CreateDirectory(x.GtestXunitConverterOutputPath) |> ignore
 
-            let iterateOverProjectFiles(projectFile : ProjectFiles) = 
-                this.testFiles <- this.testFiles @ projectHelper.GetCppCompilationFiles(projectFile.path, x.TestSuffix, x.PathReplacementStrings)
-
-            solutionHelper.GetProjectFilesFromSolutions(x.SolutionPathToAnalyse) |> Seq.iter (fun x -> iterateOverProjectFiles x)
-
-            for repfile in Directory.GetFiles(Directory.GetParent(this.GtestXMLReportFile).ToString(), Path.GetFileName(this.GtestXMLReportFile)) do
-                this.ParseXunitReport repfile
+            if not(x.SkipSearchForFileLocation) && not(String.IsNullOrEmpty(x.SolutionPathToAnalyse)) then
+                let solutionHelper = new VSSolutionUtils()
+                let projectHelper = new VSProjectUtils()
+                let iterateOverProjectFiles(projectFile : ProjectFiles) = 
+                    this.testFiles <- this.testFiles @ projectHelper.GetCompilationFiles(projectFile.path, x.TestSuffix, x.PathReplacementStrings)
+                solutionHelper.GetProjectFilesFromSolutions(x.SolutionPathToAnalyse) |> Seq.iter (fun x -> iterateOverProjectFiles x)
+                
+            if x.RunTests then
+                result <- x.ExecuteTests executor
+            else 
+                for repfile in Directory.GetFiles(Directory.GetParent(this.GtestXMLReportFile).ToString(), Path.GetFileName(this.GtestXMLReportFile)) do
+                    this.ParseXunitReport repfile
 
             if this.BuildEngine = null then
                 System.Console.WriteLine(sprintf "GtestXunitConverter End: %u ms" stopWatchTotal.ElapsedMilliseconds)

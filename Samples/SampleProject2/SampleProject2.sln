@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+# Visual Studio 2012
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib", "src\lib\lib.vcxproj", "{12B372F8-F731-498E-8DFE-AA3DC11E7628}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cli", "src\cli\cli.vcxproj", "{12339779-3F26-4C88-9067-057F65D2B908}"

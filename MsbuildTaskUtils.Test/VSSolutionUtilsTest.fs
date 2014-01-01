@@ -10,7 +10,7 @@ type VSSolutionUtilsTest() =
     [<Test>]
     member test.``Should Read the Corrent Number of source files in project`` () = 
         let vsproject = new VSProjectUtils()
-        let projects = vsproject.GetCppCompilationFiles("testdata\\project1\\project1.vcxproj", "", "")
+        let projects = vsproject.GetCompilationFiles("testdata\\project1\\project1.vcxproj", "", "")
 
         projects.Length |> should equal 4
         let mutable expectedPath = Path.Combine(Directory.GetParent("testdata\\project1\\project1.vcxproj").ToString(), "source1.cpp")
@@ -25,7 +25,7 @@ type VSSolutionUtilsTest() =
     [<Test>]
     member test.``Should Read the Corrent Number of source files in project give a include search string`` () = 
         let vsproject = new VSProjectUtils()
-        let projects = vsproject.GetCppCompilationFiles("testdata\\project1\\project1.vcxproj", "ce1.cpp;er1.hpp", "")
+        let projects = vsproject.GetCompilationFiles("testdata\\project1\\project1.vcxproj", "ce1.cpp;er1.hpp", "")
 
         projects.Length |> should equal 2
         let mutable expectedPath = Path.Combine(Directory.GetParent("testdata\\project1\\project1.vcxproj").ToString(), "source1.cpp")
@@ -36,7 +36,7 @@ type VSSolutionUtilsTest() =
     [<Test>]
     member test.``Should Read the Corrent Number of source files in project give a include search string without case sensitive`` () = 
         let vsproject = new VSProjectUtils()
-        let projects = vsproject.GetCppCompilationFiles("testdata\\project1\\project1.vcxproj", "Ce1.cpp;eR1.hpp", "")
+        let projects = vsproject.GetCompilationFiles("testdata\\project1\\project1.vcxproj", "Ce1.cpp;eR1.hpp", "")
 
         projects.Length |> should equal 2
         let mutable expectedPath = Path.Combine(Directory.GetParent("testdata\\project1\\project1.vcxproj").ToString(), "source1.cpp")

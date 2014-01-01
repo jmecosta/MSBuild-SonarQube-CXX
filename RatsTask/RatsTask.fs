@@ -13,9 +13,8 @@ open System.Xml.Linq
 open System.Diagnostics
 open Microsoft.Build
 open System.Xml
-open Microsoft.Build.Evaluation
 open Microsoft.Build.Framework
-open Microsoft.Build.Logging
+
 open Microsoft.Build.Utilities
 open Microsoft.Win32
 open MSBuild.Tekla.Tasks.MsbuildTaskUtils
@@ -207,7 +206,7 @@ type RatsTask() as this =
                 ()
 
             let iterateOverProjectFiles(projectFile : ProjectFiles) = 
-                projectHelper.GetCppCompilationFiles(projectFile.path, "", x.PathReplacementStrings)  |> Seq.iter (fun x -> iterateOverFiles x)
+                projectHelper.GetCompilationFiles(projectFile.path, "", x.PathReplacementStrings)  |> Seq.iter (fun x -> iterateOverFiles x)
 
             solutionHelper.GetProjectFilesFromSolutions(x.SolutionPathToAnalyse) |> Seq.iter (fun x -> iterateOverProjectFiles x)
 

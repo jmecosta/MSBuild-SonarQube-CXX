@@ -72,6 +72,8 @@ type CppProjectFile = XmlProvider<"""<?xml version="1.0" encoding="utf-8"?>
   <ItemGroup>
     <ClInclude Include="header1.hpp" />
     <ClInclude Include="header2.hpp" />
+    <Compile Include="Strings.cs" />
+    <Compile Include="Strings.cs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
