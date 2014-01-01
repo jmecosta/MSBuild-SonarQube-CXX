@@ -182,7 +182,7 @@ type RootConfigurationPropsChecksTests() =
         manager.SaveSqaleModelToDskAsXml(model, "cxx-model-project.xml")
         manager.WriteSqaleModelToFile(model, "cxx-model.xml")
 
-    [<Test>]
+    //[<Test>]
     member test.``Read Cxx Project`` () = 
         let manager = new SqaleManager()
         let model = manager.ReadSqaleModelToDskAsXml("cxx-model-project.xml")
@@ -197,7 +197,7 @@ type RootConfigurationPropsChecksTests() =
         manager.SaveSqaleModelToDskAsXml(model, "cxx-model-project-updated.xml")
         ()
 
-    [<Test>]
+    //[<Test>]
     member test.``Read A Project and Merge Info From Another Project`` () = 
         let manager = new SqaleManager()
         let model = manager.ReadSqaleModelToDskAsXml("cxx-model-project.xml")
