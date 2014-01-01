@@ -45,6 +45,12 @@
     <Reference Include="FSharp.Core">
       <HintPath>..\References\FSharp.Core.dll</HintPath>
     </Reference>
+    <Reference Include="FSharp.Data">
+      <HintPath>..\References\FSharp.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="FSharp.Data.DesignTime">
+      <HintPath>..\References\FSharp.Data.DesignTime.dll</HintPath>
+    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
