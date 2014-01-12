@@ -259,10 +259,11 @@ type GtestXunitConverterTask() as this =
                 if File.Exists(x.GtestXMLReportFile) then
                     this.ParseXunitReport x.GtestXMLReportFile
 
-        if Environment.GetEnvironmentVariable("TEAMCITY_PROJECT_NAME") = null then           
-            returncode = 0
-        else
-            true            
+        if returncode <> 0 then
+            logger.LogError(sprintf "%s Exit with Return Code = %d" x.GtestExeFile returncode)
+
+        returncode = 0          
+        
 
     override x.Execute() =
 
