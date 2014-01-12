@@ -110,6 +110,7 @@ type CommandExecutor(logger : TaskLoggingHelper, timeout : int64) =
             this.returncode
 
         member this.CancelExecution =
+            
             if this.proc.HasExited = false then
                 try
                     this.killProcess(this.proc.Id) |> ignore
