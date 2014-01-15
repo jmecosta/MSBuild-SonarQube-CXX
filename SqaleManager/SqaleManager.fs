@@ -160,8 +160,15 @@ type SqaleManager() =
                     addLine(sprintf """            <chc>""", fileToWrite)
                     addLine(sprintf """                <rule-repo>%s</rule-repo>""" rule.repo, file)
                     addLine(sprintf """                <rule-key>%s</rule-key>""" rule.key, file)
-                    writePropToFile("remediationFactor", rule.remediationFactorVal, rule.remediationFactorTxt, file)
                     writePropToFile("remediationFunction", "", rule.remediationFunction, file)
+                    writePropToFile("remediationFactor", rule.remediationFactorVal, rule.remediationFactorTxt, file)
+
+                    if not(rule.remediationFunction.Equals(Constants.RemediationFunction.CONSTANT_ISSUE)) then
+                        if String.IsNullOrEmpty(rule.remediationOffsetVal) then                 
+                            writePropToFile("offset", "0.0", "d", file)
+                        else
+                            writePropToFile("offset", rule.remediationOffsetVal, rule.remediationOffsetTxt, file)
+
                     addLine(sprintf """            </chc>""", fileToWrite)
            
         addLine("""<?xml version="1.0"?>""", fileToWrite)
@@ -248,6 +255,16 @@ type SqaleManager() =
             else
                 addLine(sprintf """        <remediationFunction>%s</remediationFunction>""" rule.remediationFunction, fileToWrite)
 
+            if String.IsNullOrEmpty(rule.remediationOffsetVal) then
+                addLine(sprintf """        <remediationOffsetVal>0.0</remediationOffsetVal>""", fileToWrite)
+            else
+                addLine(sprintf """        <remediationOffsetVal>%s</remediationOffsetVal>""" rule.remediationFunction, fileToWrite)
+
+            if String.IsNullOrEmpty(rule.remediationOffsetTxt) then
+                addLine(sprintf """        <remediationOffsetUnit>undefined</remediationOffsetUnit>""", fileToWrite)
+            else
+                addLine(sprintf """        <remediationOffsetUnit>%s</remediationOffsetUnit>""" rule.remediationFunction, fileToWrite)
+
             if String.IsNullOrEmpty(rule.severity) then
                 addLine(sprintf """        <severity>undefined</severity>""", fileToWrite)
             else
@@ -290,6 +307,8 @@ type SqaleManager() =
             rule.remediationFactorVal <- item.RemediationFactorVal.ToString()
             rule.remediationFactorTxt <- item.RemediationFactorUnit
             rule.remediationFunction <- item.RemediationFunction
+            rule.remediationOffsetTxt <- item.RemediationOffsetUnit
+            rule.remediationOffsetVal <- item.RemediationOffsetVal.ToString()
             rule.severity <- item.Severity
             model.CreateRuleInProfile(rule) |> ignore
                        

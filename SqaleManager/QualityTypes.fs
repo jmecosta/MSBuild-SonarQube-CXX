@@ -14,6 +14,8 @@ type Rule() =
     member val remediationFactorVal = "" with get, set
     member val remediationFactorTxt = "" with get, set
     member val remediationFunction = "" with get, set
+    member val remediationOffsetVal = "" with get, set
+    member val remediationOffsetTxt = "" with get, set
     member val severity = "" with get, set
     member val repo = "" with get, set
      

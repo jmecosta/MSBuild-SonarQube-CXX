@@ -8,7 +8,7 @@ let main argv =
     printfn "%A" argv
     let manager = new SqaleManager()
     
-    if argv.[1] = null then
+    if argv.Length = 1 then
         let model = manager.ReadSqaleModelToDskAsXml(argv.[0])
         manager.WriteSqaleModelToFile(model, "cxx-model.xml")
     else

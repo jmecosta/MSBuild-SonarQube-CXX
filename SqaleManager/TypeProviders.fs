@@ -12,6 +12,8 @@ type CxxProjectDefinition = XmlProvider<"""<?xml version="1.0" encoding="ASCII"?
         <remediationFactorVal>0.0</remediationFactorVal>
         <remediationFactorUnit>undefined</remediationFactorUnit>
         <remediationFunction>undefined</remediationFunction>
+        <remediationOffsetVal>0.0</remediationOffsetVal>
+        <remediationOffsetUnit>undefined</remediationOffsetUnit>
         <severity>MINOR</severity>
         <repo>cppcheck</repo>
         <description>
@@ -25,6 +27,8 @@ type CxxProjectDefinition = XmlProvider<"""<?xml version="1.0" encoding="ASCII"?
         <remediationFactorVal>0.0</remediationFactorVal>
         <remediationFactorUnit>undefined</remediationFactorUnit>
         <remediationFunction>undefined</remediationFunction>
+        <remediationOffsetVal>0.0</remediationOffsetVal>
+        <remediationOffsetUnit>d</remediationOffsetUnit>
         <severity>MINOR</severity>
         <repo>cppcheck</repo>
         <description>
@@ -123,6 +127,11 @@ type SqaleModelType = XmlProvider<"""<?xml version="1.0"?>
                 <prop>
                     <key>remediationFunction</key>
                     <txt>linear</txt>
+                </prop>
+                <prop>
+                    <key>offset</key>
+                    <val>0.0</val>
+                    <txt>d</txt>
                 </prop>
             </chc>                          
         </chc>

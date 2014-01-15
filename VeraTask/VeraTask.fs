@@ -198,14 +198,17 @@ type VeraTask() as this =
                     let pathignore = Path.Combine(Directory.GetParent(x.SolutionPathToAnalyse).ToString(), ignore.Trim())
                     if Path.GetFullPath(file) = Path.GetFullPath(pathignore) then skip <- true
 
-                if not(skip) then
+                let IsSupported(file : string) = 
+                    file.EndsWith(".cpp") || file.EndsWith(".c") || file.EndsWith(".cc") || file.EndsWith(".h") || file.EndsWith(".hpp")
+
+                if not(skip) && IsSupported(file) then
                     let index = sprintf "%i" this.counter 
                     let xml_file = Path.Combine(x.VeraOutputPath, String.Concat(String.Concat("vera++-result-", index),".xml"))
                     let arguments = x.generateCommandLineArgs(file)
                     logger.LogMessage(sprintf "Vera++Command: %s %s" x.VeraPath arguments)
                     x.ExecuteVera executor file xml_file |> ignore
-                    this.counter <- this.counter + 1
-                ()
+                    this.counter <- this.counter + 1                        
+                    ()
 
             let iterateOverProjectFiles(projectFile : ProjectFiles) = 
                 projectHelper.GetCompilationFiles(projectFile.path, "", x.PathReplacementStrings)  |> Seq.iter (fun x -> iterateOverFiles x projectFile.path)

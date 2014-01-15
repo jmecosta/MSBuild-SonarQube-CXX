@@ -20,7 +20,7 @@ module Constants =
         [<Literal>]
         let LINEAR_OFFSET = "linear_offset"
         [<Literal>]
-        let CONSTANT_RESOURCE = "constant_resource"
+        let CONSTANT_ISSUE = "constant_issue"
 
     module RemediationUnit = 
         [<Literal>]
