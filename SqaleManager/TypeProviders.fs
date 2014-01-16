@@ -130,7 +130,7 @@ type SqaleModelType = XmlProvider<"""<?xml version="1.0"?>
                 </prop>
                 <prop>
                     <key>offset</key>
-                    <val>0.0</val>
+                    <val>0.0d</val>
                     <txt>d</txt>
                 </prop>
             </chc>                          
