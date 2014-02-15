@@ -118,6 +118,7 @@ type NunitRunnerTask() as this =
     member val TestRunner = _testrunner with get, set
     member val GallioTestFilter = "" with get, set
     member val NunitTestFilter = "" with get, set
+    member val UseIcarus = false with get, set 
 
     // output properties
     member val OutputReportPaths = "" with get, set
@@ -297,6 +298,23 @@ type NunitRunnerTask() as this =
 
         builder.ToString()
 
+    member x.generateCommandLineArgsForGallioIcarus =
+        let builder = new CommandLineBuilder()
+
+        let GetAssemblies = 
+            let mutable stringtests = ""
+            // target assemblies
+            if not(String.IsNullOrWhiteSpace(x.AssembliesToTest)) then
+                let dirs = x.AssembliesToTest.Split(";".ToCharArray())
+
+                for dir in dirs do
+                    stringtests <- stringtests + dir + " "
+            stringtests
+
+        // misc options
+        builder.AppendSwitch(GetAssemblies)
+        builder.ToString()
+
     member x.ExecuteRunner executor execcmd cmdLineArgs =
         // set environment
         let env = Map.ofList [("TEKLA_COP_SOLUTION_PATH", "")]
@@ -317,14 +335,20 @@ type NunitRunnerTask() as this =
         if x.ProduceCoverage.Equals("true") then
             if x.TestRunner.Equals("Gallio") then
                 _log.LogMessage(sprintf "Gallio test runner Command: %s %s" x.OpenCoverPath x.generateCommandLineArgsForCoverageWithGallio)
-                x.ExecuteRunner executor x.OpenCoverPath x.generateCommandLineArgsForCoverageWithGallio                    
+                x.ExecuteRunner executor x.OpenCoverPath x.generateCommandLineArgsForCoverageWithGallio
             else
                 _log.LogMessage(sprintf "NUnit test runner Command: %s %s" x.OpenCoverPath x.generateCommandLineArgsForCoverageWithNunit)
                 x.ExecuteRunner executor x.OpenCoverPath x.generateCommandLineArgsForCoverageWithNunit
         else
             if x.TestRunner.Equals("Gallio") then
-                _log.LogMessage(sprintf "Gallio test runner Command: %s %s" x.GallioPath x.generateCommandLineArgsForGallio)
-                x.ExecuteRunner executor x.GallioPath x.generateCommandLineArgsForGallio
+                
+                if x.UseIcarus then
+                    let path = Path.Combine(Path.GetDirectoryName(x.GallioPath), "Gallio.Icarus.exe")
+                    _log.LogMessage(sprintf "Gallio Icarus Command: %s %s" path x.generateCommandLineArgsForGallio)
+                    x.ExecuteRunner executor path x.generateCommandLineArgsForGallioIcarus
+                else
+                    _log.LogMessage(sprintf "Gallio test runner Command: %s %s" x.GallioPath x.generateCommandLineArgsForGallio)
+                    x.ExecuteRunner executor x.GallioPath x.generateCommandLineArgsForGallio
             else
                 _log.LogMessage(sprintf "NUnit test runner Command: %s %s" getUnitPath x.generateCommandLineArgsForNunit)
                 x.ExecuteRunner executor getUnitPath x.generateCommandLineArgsForNunit  
@@ -340,8 +364,8 @@ type NunitRunnerTask() as this =
             || e.Data.Contains("System.Runtime.Remoting.RemotingException: Failed to connect to an IPC") then
                 _log.LogWarning(e.Data)
                 _log.LogMessage("Reset And Retry with a different test runner")
-                if x.TestRunner = "Gallio" then
-                    x.TestRunner <- "Nunit"
+                //if x.TestRunner = "Gallio" then
+                //    x.TestRunner <- "Nunit"
 
                 x.Tries <- x.Tries - 1
                 Thread.Sleep(5000)
@@ -396,7 +420,8 @@ type NunitRunnerTask() as this =
           
           x.TimeoutOrException <- true
 
-          KillUtils().KillRunningProcesses true _log false
+          if not(x.UseIcarus) then
+            KillUtils().KillRunningProcesses true _log false
           
         }
 
@@ -405,7 +430,6 @@ type NunitRunnerTask() as this =
         if String.IsNullOrEmpty(x.OutputReportPaths) then
             x.OutputReportPaths <- tempDir
 
-        
         let mutable result = true
 
         if String.IsNullOrWhiteSpace(x.AssembliesToTest) then

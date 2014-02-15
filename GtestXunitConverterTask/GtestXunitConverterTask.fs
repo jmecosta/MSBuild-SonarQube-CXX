@@ -133,7 +133,7 @@ type GtestXunitConverterTask() as this =
     /// If True GtestExe Needs to be given
     member val RunTests = false with get, set
 
-    member x.ParseXunitReport filePath = 
+    member x.ParseXunitReport(filePath :string, logger : TaskLoggingHelper) = 
         let xunitReport = GtestXmlReport.Parse(File.ReadAllText(filePath))
 
         let mutable xmloutputcontent = ""
@@ -146,8 +146,16 @@ type GtestXunitConverterTask() as this =
             let checkPresenceOfTest(filePath : string) = 
                 let lineswithoutspaces = File.ReadAllText(filePath).Replace(" ", "")
                 lineswithoutspaces.Contains("TEST_F(" + className) || lineswithoutspaces.Contains("TEST(" + className)
-                   
-            (List.toArray this.testFiles) |> Array.find (fun elem -> checkPresenceOfTest(elem)) 
+
+            try
+                (List.toArray this.testFiles) |> Array.find (fun elem -> checkPresenceOfTest(elem))
+            with
+             | ex -> 
+                    if this.BuildEngine = null then
+                        System.Console.WriteLine(sprintf "Cannot Find Test Class: %s" className)
+                    else                        
+                        logger.LogWarning(sprintf "Cannot Find Test Class: %s" className)
+                    ""
 
         let XmlEscape(unescaped : string) =
             let doc = new XmlDocument()
@@ -249,7 +257,7 @@ type GtestXunitConverterTask() as this =
                 logger.LogMessage(sprintf "gtest: %s %s" x.GtestExeFile (x.generateCommandLineArgs ""))
             returncode <- (executor :> ICommandExecutor).ExecuteCommand(x.GtestExeFile, (x.generateCommandLineArgs ""), env, x.ProcessOutputDataReceived, x.ProcessOutputDataReceived, Directory.GetParent(x.GtestExeFile).ToString())
             if File.Exists(x.GtestXMLReportFile) then
-                this.ParseXunitReport x.GtestXMLReportFile
+                this.ParseXunitReport(x.GtestXMLReportFile,logger)
         else
             for i in x.SeedStart .. x.SeedEnd do
                 x.CurrentSeed <- i.ToString()
@@ -257,7 +265,7 @@ type GtestXunitConverterTask() as this =
                     logger.LogMessage(sprintf "gtest: %s %s" x.GtestExeFile (x.generateCommandLineArgs(i.ToString())))
                 returncode <- (executor :> ICommandExecutor).ExecuteCommand(x.GtestExeFile, x.generateCommandLineArgs(i.ToString()), env, x.ProcessOutputDataReceived, x.ProcessOutputDataReceived, Directory.GetParent(x.GtestExeFile).ToString())
                 if File.Exists(x.GtestXMLReportFile) then
-                    this.ParseXunitReport x.GtestXMLReportFile
+                    this.ParseXunitReport(x.GtestXMLReportFile, logger)
 
         if returncode <> 0 then
             logger.LogError(sprintf "%s Exit with Return Code = %d" x.GtestExeFile returncode)
@@ -289,7 +297,7 @@ type GtestXunitConverterTask() as this =
                 result <- x.ExecuteTests executor
             else 
                 for repfile in Directory.GetFiles(Directory.GetParent(this.GtestXMLReportFile).ToString(), Path.GetFileName(this.GtestXMLReportFile)) do
-                    this.ParseXunitReport repfile
+                    this.ParseXunitReport(repfile, logger)
 
             if this.BuildEngine = null then
                 System.Console.WriteLine(sprintf "GtestXunitConverter End: %u ms" stopWatchTotal.ElapsedMilliseconds)
