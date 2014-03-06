@@ -132,7 +132,7 @@ type RatsTask() as this =
 
         while tries > 0  && returncode > 0 do
             (executor :> ICommandExecutor).ResetData()
-            returncode <- (executor :> ICommandExecutor).ExecuteCommand(x.RatsPath, cmdLineArgs, env)
+            returncode <- (executor :> ICommandExecutor).ExecuteCommand(x.RatsPath, cmdLineArgs, env, Environment.CurrentDirectory)
             if not((executor :> ICommandExecutor).GetErrorCode = ReturnCode.Ok) || returncode > 0 then
                 tries <- tries - 1
 

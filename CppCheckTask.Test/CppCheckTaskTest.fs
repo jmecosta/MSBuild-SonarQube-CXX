@@ -29,7 +29,7 @@ type CppCheckTaskTest() =
         task.CppCheckOutputType <- "vs7"
         let mockExecutor =
             Mock<ICommandExecutor>()
-                .Setup(fun x -> <@ x.ExecuteCommand(any(), any(), any()) @>).Returns(0)
+                .Setup(fun x -> <@ x.ExecuteCommand(any(), any(), any(), any()) @>).Returns(0)
                 .Setup(fun x -> <@ x.GetStdError @>).Returns([])
                 .Setup(fun x -> <@ x.GetErrorCode @>).Returns(ReturnCode.Ok)
                 .Create()
@@ -43,7 +43,7 @@ type CppCheckTaskTest() =
         task.CppCheckOutputType <- "vs7"
         let mockExecutor =
             Mock<ICommandExecutor>()
-                .Setup(fun x -> <@ x.ExecuteCommand(any(), any(), any()) @>).Returns(0)
+                .Setup(fun x -> <@ x.ExecuteCommand(any(), any(), any(), any()) @>).Returns(0)
                 .Setup(fun x -> <@ x.GetStdError @>).Returns(["<?xml version=\"1.0\" encoding=\"UTF-8\"?>"; "<results>"; """<error file="E:\TSSRC\Core\Common\common\Common.cpp" line="4" id="missingInclude" severity="style" msg="Include file: &quot;cancel_proto.h&quot; not found."/>""";"</results>"])
                 .Setup(fun x -> <@ x.GetErrorCode @>).Returns(ReturnCode.Ok)
                 .Create()
@@ -58,7 +58,7 @@ type CppCheckTaskTest() =
         task.CppCheckOutputPath <- tempFile
         let mockExecutor =
             Mock<ICommandExecutor>()
-                .Setup(fun x -> <@ x.ExecuteCommand(any(), any(), any()) @>).Returns(1)
+                .Setup(fun x -> <@ x.ExecuteCommand(any(), any(), any(), any()) @>).Returns(1)
                 .Setup(fun x -> <@ x.GetStdOut @>).Returns([])
                 .Setup(fun x -> <@ x.GetErrorCode @>).Returns(ReturnCode.NokAppSpecific)
                 .Create()
@@ -73,7 +73,7 @@ type CppCheckTaskTest() =
         task.SolutionPathToAnalyse <- Directory.GetParent(tempFile).ToString()
         let mockExecutor =
             Mock<ICommandExecutor>()
-                .Setup(fun x -> <@ x.ExecuteCommand(any(), any(), any()) @>).Returns(0)
+                .Setup(fun x -> <@ x.ExecuteCommand(any(), any(), any(), any()) @>).Returns(0)
                 .Setup(fun x -> <@ x.GetErrorCode @>).Returns(ReturnCode.Ok)
                 .Setup(fun x -> <@ x.GetStdError @>).Returns(["<?xml version=\"1.0\" encoding=\"UTF-8\"?>"; "<results>"; "<error file=\"Analysis.cpp\" line=\"36\" id=\"unusedFunction\" severity=\"style\" msg=\"The function used\"/>"; "</results>"])
                 .Create()
@@ -88,7 +88,7 @@ type CppCheckTaskTest() =
         task.SolutionPathToAnalyse <- Directory.GetParent(tempFile).ToString()
         let mockExecutor =
             Mock<ICommandExecutor>()
-                .Setup(fun x -> <@ x.ExecuteCommand(any(), any(), any()) @>).Returns(0)
+                .Setup(fun x -> <@ x.ExecuteCommand(any(), any(), any(), any()) @>).Returns(0)
                 .Setup(fun x -> <@ x.GetErrorCode @>).Returns(ReturnCode.Ok)
                 .Setup(fun x -> <@ x.GetStdError @>).Returns(["<?xml version=\"1.0\" encoding=\"UTF-8\"?>"; "<results>"; "<error file=\"Analysis.cpp\" line=\"36\" id=\"unusedFunction\" severity=\"style\" msg=\"The function used\"/>"; "</results>"])
                 .Create()
@@ -103,7 +103,7 @@ type CppCheckTaskTest() =
 
         let mockExecutor =
             Mock<ICommandExecutor>()
-                .Setup(fun x -> <@ x.ExecuteCommand(any(), any(), any()) @>).Returns(0)
+                .Setup(fun x -> <@ x.ExecuteCommand(any(), any(), any(), any()) @>).Returns(0)
                 .Setup(fun x -> <@ x.GetErrorCode @>).Returns(ReturnCode.Ok)
                 .Setup(fun x -> <@ x.GetStdError @>).Returns(["<?xml version=\"1.0\" encoding=\"UTF-8\"?>"; "<results>"; "</results>"])
                 .Create()

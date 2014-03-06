@@ -32,7 +32,7 @@ type CppLintTest() =
         task.CppLintOutputType <- "vs7"
         let mockExecutor =
             Mock<ICommandExecutor>()
-                .Setup(fun x -> <@ x.ExecuteCommand(any(), any(), any()) @>).Returns(0)
+                .Setup(fun x -> <@ x.ExecuteCommand(any(), any(), any(), any()) @>).Returns(0)
                 .Setup(fun x -> <@ x.GetStdError @>).Returns([])
                 .Setup(fun x -> <@ x.GetErrorCode @>).Returns(ReturnCode.Ok)
                 .Create()
@@ -49,7 +49,7 @@ type CppLintTest() =
         task.SolutionPathToAnalyse <- "E:\\SRC\\Project\\test.sln"
         let mockExecutor =
             Mock<ICommandExecutor>()
-                .Setup(fun x -> <@ x.ExecuteCommand(any(), any(), any()) @>).Returns(0)
+                .Setup(fun x -> <@ x.ExecuteCommand(any(), any(), any(), any()) @>).Returns(0)
                 .Setup(fun x -> <@ x.GetStdError @>).Returns(data)
                 .Setup(fun x -> <@ x.GetErrorCode @>).Returns(ReturnCode.Ok)
                 .Create()

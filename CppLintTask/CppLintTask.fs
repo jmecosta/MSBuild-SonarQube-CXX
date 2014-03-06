@@ -116,7 +116,7 @@ type CppLintTask() as this =
 
         while tries > 0  && returncode > 0 do
             (executor :> ICommandExecutor).ResetData()
-            returncode <- (executor :> ICommandExecutor).ExecuteCommand(x.PythonPath, x.generateCommandLineArgs(filepath), env)
+            returncode <- (executor :> ICommandExecutor).ExecuteCommand(x.PythonPath, x.generateCommandLineArgs(filepath), env, Environment.CurrentDirectory)
             if not((executor :> ICommandExecutor).GetErrorCode = ReturnCode.Ok) then
                 tries <- tries - 1
             else

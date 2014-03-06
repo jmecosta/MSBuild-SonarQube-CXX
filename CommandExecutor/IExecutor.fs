@@ -21,7 +21,7 @@ type ICommandExecutor =
   abstract member ResetData : unit -> unit
 
   // no redirection of output
-  abstract member ExecuteCommand : string * string * Map<string, string> -> int
+  abstract member ExecuteCommand : string * string * Map<string, string> * string -> int
 
   // with redirection of output
   abstract member ExecuteCommand : string * string * Map<string, string> * (DataReceivedEventArgs -> unit) * (DataReceivedEventArgs -> unit) * string -> int
@@ -125,7 +125,7 @@ type CommandExecutor(logger : TaskLoggingHelper, timeout : int64) =
             this.output <- []
             ()
 
-        member this.ExecuteCommand(program, args, env) =
+        member this.ExecuteCommand(program, args, env, wd) =
             let startInfo = ProcessStartInfo(FileName = program,
                                              Arguments = args,
                                              WindowStyle = ProcessWindowStyle.Normal,
@@ -134,7 +134,7 @@ type CommandExecutor(logger : TaskLoggingHelper, timeout : int64) =
                                              RedirectStandardError = true,
                                              RedirectStandardInput = true,
                                              CreateNoWindow = true,
-                                             WorkingDirectory = Path.GetDirectoryName(program))
+                                             WorkingDirectory = wd)
             env |> Map.iter (addEnvironmentVariable startInfo)
 
             this.proc <- new Process(StartInfo = startInfo)

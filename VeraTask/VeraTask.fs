@@ -94,7 +94,7 @@ type VeraTask() as this =
 
         while tries > 0  && returncode > 0 do
             (executor :> ICommandExecutor).ResetData()
-            returncode <- (executor :> ICommandExecutor).ExecuteCommand(x.VeraPath, x.generateCommandLineArgs(filepath), env)
+            returncode <- (executor :> ICommandExecutor).ExecuteCommand(x.VeraPath, x.generateCommandLineArgs(filepath), env, Environment.CurrentDirectory)
             if not((executor :> ICommandExecutor).GetErrorCode = ReturnCode.Ok) || returncode > 0 then
                 tries <- tries - 1
                 if this.BuildEngine = null then

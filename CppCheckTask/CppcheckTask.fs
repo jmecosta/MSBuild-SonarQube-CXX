@@ -107,7 +107,7 @@ type CppCheckTask() as this =
         let mutable returncode = 1
 
         while tries > 0  && returncode > 0 do
-            returncode <- (executor :> ICommandExecutor).ExecuteCommand(x.CppCheckPath, cmdLineArgs, env)
+            returncode <- (executor :> ICommandExecutor).ExecuteCommand(x.CppCheckPath, cmdLineArgs, env, Environment.CurrentDirectory)
             if not((executor :> ICommandExecutor).GetErrorCode = ReturnCode.Ok) then
                 tries <- tries - 1
 

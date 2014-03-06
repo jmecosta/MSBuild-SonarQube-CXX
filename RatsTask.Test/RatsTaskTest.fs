@@ -32,7 +32,7 @@ type RatsTest() =
         task.RatsOutputType <- "vs7"
         let mockExecutor =
             Mock<ICommandExecutor>()
-                .Setup(fun x -> <@ x.ExecuteCommand(any(), any(), any()) @>).Returns(0)
+                .Setup(fun x -> <@ x.ExecuteCommand(any(), any(), any(), any()) @>).Returns(0)
                 .Setup(fun x -> <@ x.GetStdOut @>).Returns([])
                 .Setup(fun x -> <@ x.GetErrorCode @>).Returns(ReturnCode.Ok)
                 .Create()
@@ -45,7 +45,7 @@ type RatsTest() =
         task.RatsOutputType <- "xml"
         let mockExecutor =
             Mock<ICommandExecutor>()
-                .Setup(fun x -> <@ x.ExecuteCommand(any(), any(), any()) @>).Returns(0)
+                .Setup(fun x -> <@ x.ExecuteCommand(any(), any(), any(), any()) @>).Returns(0)
                 .Setup(fun x -> <@ x.GetStdOut @>).Returns(lines)
                 .Setup(fun x -> <@ x.GetErrorCode @>).Returns(ReturnCode.Ok)
                 .Create()

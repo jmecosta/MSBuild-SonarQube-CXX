@@ -275,10 +275,22 @@ type NunitRunnerTask() as this =
             let mutable stringtests = ""
             // target assemblies
             if not(String.IsNullOrWhiteSpace(x.AssembliesToTest)) then
-                let dirs = x.AssembliesToTest.Split(";".ToCharArray())
+                let assemblies = x.AssembliesToTest.Split(";".ToCharArray())
 
-                for dir in dirs do
-                    stringtests <- stringtests + dir + " "
+                for assembly in assemblies do
+                    if Path.IsPathRooted(assembly) then
+                        let array1 = [| '\\'; '/' |]    
+                        let paths = assembly.Split(array1)
+                        let file = paths.[paths.Length - 1]
+                        let parentDir = (assembly.Replace(file, "")).TrimEnd(array1)                              
+                        let listOfFiles = Directory.GetFiles(parentDir, file)
+                        for file in listOfFiles do
+                            stringtests <- stringtests + Path.Combine(Environment.CurrentDirectory, file) + " "
+                    else
+                        let listOfFiles = Directory.GetFiles(Environment.CurrentDirectory, assembly)
+                        for file in listOfFiles do
+                            stringtests <- stringtests + Path.Combine(Environment.CurrentDirectory, file) + " "
+
             stringtests
 
         let GetFilter =
@@ -305,10 +317,11 @@ type NunitRunnerTask() as this =
             let mutable stringtests = ""
             // target assemblies
             if not(String.IsNullOrWhiteSpace(x.AssembliesToTest)) then
-                let dirs = x.AssembliesToTest.Split(";".ToCharArray())
+                let assemblies = x.AssembliesToTest.Split(";".ToCharArray())
 
-                for dir in dirs do
-                    stringtests <- stringtests + dir + " "
+                for assembly in assemblies do
+                    stringtests <- stringtests + assembly + " "
+    
             stringtests
 
         // misc options
