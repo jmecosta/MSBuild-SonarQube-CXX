@@ -7,6 +7,9 @@ open System.Diagnostics
 open System.Management
 open Microsoft.FSharp.Collections
 open Microsoft.Build.Utilities
+open System.Runtime.InteropServices
+open WindowsInput
+
 
 type ReturnCode =
    | Ok = 0
@@ -18,16 +21,35 @@ type ICommandExecutor =
   abstract member GetStdError : list<string>
   abstract member GetErrorCode : ReturnCode
   abstract member CancelExecution : ReturnCode
+  abstract member CancelExecutionAndSpanProcess : string [] -> ReturnCode
   abstract member ResetData : unit -> unit
 
   // no redirection of output
   abstract member ExecuteCommand : string * string * Map<string, string> * string -> int
+  abstract member ExecuteCommandWait : string * string * Map<string, string> * string -> int
 
   // with redirection of output
   abstract member ExecuteCommand : string * string * Map<string, string> * (DataReceivedEventArgs -> unit) * (DataReceivedEventArgs -> unit) * string -> int
 
+
 type CommandExecutor(logger : TaskLoggingHelper, timeout : int64) =
     let addEnvironmentVariable (startInfo:ProcessStartInfo) a b = startInfo.EnvironmentVariables.Add(a, b)
+
+    let KillPrograms(currentProcessName : string) =
+        if not(String.IsNullOrEmpty(currentProcessName)) then
+            try
+                let processId = Process.GetCurrentProcess().Id
+                let processes = System.Diagnostics.Process.GetProcessesByName(currentProcessName)
+
+                for proc in processes do
+                    if processId <> proc.Id then
+                        try
+                            Process.GetProcessById(proc.Id).Kill()
+                        with
+                        | ex -> ()
+            with
+            | ex -> ()
+
     member val Logger = logger
     member val stopWatch = Stopwatch.StartNew()
     member val proc : Process  = new Process() with get, set
@@ -35,6 +57,8 @@ type CommandExecutor(logger : TaskLoggingHelper, timeout : int64) =
     member val error : string list = [] with get, set
     member val returncode : ReturnCode = ReturnCode.Ok with get, set
     member val cancelSignal : bool = false with get, set
+
+    member val Program : string = "" with get, set
 
     member this.killProcess(pid : int32) : bool =
         let mutable didIkillAnybody = false
@@ -83,12 +107,14 @@ type CommandExecutor(logger : TaskLoggingHelper, timeout : int64) =
         this.stopWatch.Restart()
         if not(String.IsNullOrWhiteSpace(e.Data)) then
             this.error <- this.error @ [e.Data]
+            System.Diagnostics.Debug.WriteLine("ERROR:" + e.Data)
         ()
 
     member this.ProcessOutputDataReceived(e : DataReceivedEventArgs) =
         this.stopWatch.Restart()
         if not(String.IsNullOrWhiteSpace(e.Data)) then
             this.output <- this.output @ [e.Data]
+            System.Diagnostics.Debug.WriteLine(e.Data)
         ()
 
 
@@ -98,6 +124,7 @@ type CommandExecutor(logger : TaskLoggingHelper, timeout : int64) =
             use mo = new ManagementObject("win32_process.handle='" + Id.ToString() + "'")
             let tmp = mo.Get()
             Convert.ToInt32(mo.["ParentProcessId"])
+
 
     interface ICommandExecutor with
         member this.GetStdOut =
@@ -109,13 +136,18 @@ type CommandExecutor(logger : TaskLoggingHelper, timeout : int64) =
         member this.GetErrorCode =
             this.returncode
 
-        member this.CancelExecution =
+        member this.CancelExecution =            
+            if this.proc.HasExited = false then
+                this.proc.Kill()
+            this.cancelSignal <- true
+            ReturnCode.Ok
+
+        member this.CancelExecutionAndSpanProcess(processNames : string []) =
             
             if this.proc.HasExited = false then
-                try
-                    this.killProcess(this.proc.Id) |> ignore
-                with
-                | ex -> ()
+                processNames |> Array.iter (fun name -> KillPrograms(name))
+                if this.proc.HasExited = false then
+                    this.proc.Kill()
 
             this.cancelSignal <- true
             ReturnCode.Ok
@@ -126,6 +158,7 @@ type CommandExecutor(logger : TaskLoggingHelper, timeout : int64) =
             ()
 
         member this.ExecuteCommand(program, args, env, wd) =
+            this.Program <- program
             let startInfo = ProcessStartInfo(FileName = program,
                                              Arguments = args,
                                              WindowStyle = ProcessWindowStyle.Normal,
@@ -154,7 +187,8 @@ type CommandExecutor(logger : TaskLoggingHelper, timeout : int64) =
             this.proc.ExitCode
 
 
-        member this.ExecuteCommand(program, args, env, outputHandler, errorHandler, workingDir) =               
+        member this.ExecuteCommand(program, args, env, outputHandler, errorHandler, workingDir) =        
+            this.Program <- program       
             let startInfo = ProcessStartInfo(FileName = program,
                                              Arguments = args,
                                              WindowStyle = ProcessWindowStyle.Normal,
@@ -182,5 +216,22 @@ type CommandExecutor(logger : TaskLoggingHelper, timeout : int64) =
             this.cancelSignal <- true
             this.proc.ExitCode
 
+        member this.ExecuteCommandWait(program, args, env, wd) =
+            this.Program <- program
+            let startInfo = ProcessStartInfo(FileName = program,
+                                             Arguments = args,
+                                             CreateNoWindow = true,
+                                             WindowStyle = ProcessWindowStyle.Hidden,
+                                             WorkingDirectory = wd)
+
+            env |> Map.iter (addEnvironmentVariable startInfo)
+
+            this.proc <- new Process(StartInfo = startInfo)
+            let ret = this.proc.Start()
+            this.stopWatch.Restart()
+            Async.Start(this.TimerControl());
+            this.proc.WaitForExit()
+            this.cancelSignal <- true
+            this.proc.ExitCode
 
 

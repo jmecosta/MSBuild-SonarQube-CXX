@@ -1,0 +1,8 @@
+﻿<Project DefaultTargets="Elevate" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\root_configuration.props" Condition="$(UserSRCDir) == ''"/>
+  <UsingTask TaskName="ElevateTask" AssemblyFile="$(MSBuildTasksFolder)\ElevateTask.dll" />
+
+  <Target Name="Elevate">
+    <ElevateTask ElevateCommandToExecute="$(UserSRCDir)\MSBuild\BuildTools\Gallio\bin\Gallio.Echo.exe" ElevateCommandArgs="$(UserSRCDir)\MSBuild\BuildTools\Nunit"/>
+  </Target>
+</Project>

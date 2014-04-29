@@ -118,7 +118,8 @@ type NunitRunnerTask() as this =
     member val TestRunner = _testrunner with get, set
     member val GallioTestFilter = "" with get, set
     member val NunitTestFilter = "" with get, set
-    member val UseIcarus = false with get, set 
+    member val UseIcarus = false with get, set
+    member val DisableRetry = false  with get, set
 
     // output properties
     member val OutputReportPaths = "" with get, set
@@ -373,8 +374,8 @@ type NunitRunnerTask() as this =
             let datetime = DateTime.Now.ToString()
             _log.LogMessage(sprintf "%s : %s" datetime e.Data)
 
-            if e.Data.Contains("'Tekla.Structures.ModelInternal.DelegateProxy' threw an exception.") 
-            || e.Data.Contains("System.Runtime.Remoting.RemotingException: Failed to connect to an IPC") then
+            if (e.Data.Contains("'Tekla.Structures.ModelInternal.DelegateProxy' threw an exception.")
+                || e.Data.Contains("System.Runtime.Remoting.RemotingException: Failed to connect to an IPC")) && not(x.DisableRetry) then
                 _log.LogWarning(e.Data)
                 _log.LogMessage("Reset And Retry with a different test runner")
                 //if x.TestRunner = "Gallio" then

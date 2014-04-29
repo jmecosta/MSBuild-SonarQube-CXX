@@ -256,8 +256,11 @@ type GtestXunitConverterTask() as this =
             if not(this.BuildEngine = null) then
                 logger.LogMessage(sprintf "gtest: %s %s" x.GtestExeFile (x.generateCommandLineArgs ""))
             returncode <- (executor :> ICommandExecutor).ExecuteCommand(x.GtestExeFile, (x.generateCommandLineArgs ""), env, x.ProcessOutputDataReceived, x.ProcessOutputDataReceived, Directory.GetParent(x.GtestExeFile).ToString())
-            if File.Exists(x.GtestXMLReportFile) then
-                this.ParseXunitReport(x.GtestXMLReportFile,logger)
+            try
+                if File.Exists(x.GtestXMLReportFile) then
+                    this.ParseXunitReport(x.GtestXMLReportFile,logger)
+            with
+            | ex -> ()
         else
             for i in x.SeedStart .. x.SeedEnd do
                 x.CurrentSeed <- i.ToString()
@@ -281,7 +284,10 @@ type GtestXunitConverterTask() as this =
 
             if Directory.Exists(x.GtestXunitConverterOutputPath) then
                 for filename in Directory.GetFiles(x.GtestXunitConverterOutputPath, @"xunit-result-*.xml", SearchOption.AllDirectories) do
-                    File.Delete(filename)
+                    try
+                        File.Delete(filename)
+                    with
+                    | ex -> ()
             else
                 logger.LogMessage(sprintf "Create New Folder: %s " x.GtestXunitConverterOutputPath)
                 Directory.CreateDirectory(x.GtestXunitConverterOutputPath) |> ignore
